@@ -1,0 +1,23 @@
+.timeSlotAvailable{
+	background-color: green;
+	color:white;
+	width:190px;
+	float: left;
+	margin-left: 5px;
+}
+
+.timeSlotUnavailable{
+	background-color: darkgray;
+	color: gray;
+	width:190px;
+	float: left;
+	margin-left: 5px;
+}
+
+.timeSlotChosen{
+	background-color: red;
+	color:white;
+	width:190px;
+	float: left;
+	margin-left: 5px;
+}

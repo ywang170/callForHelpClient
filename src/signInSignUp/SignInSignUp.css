@@ -1,0 +1,78 @@
+.signInSignUpContainer{
+	width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.signInSignUpSubContainer{
+	width: 100%;
+	padding-top: 30px;
+	float:left;
+	min-height: 600px;
+}
+
+.title{
+	font-size: 24pt;
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 30px;
+	width: 100%;
+}
+
+.toggleButton {
+	background-color: green;
+	border: none;
+	color: white;
+	text-align: center;
+	display: inline-block;
+	float: right;
+	margin-right: 200px;
+	cursor: pointer;
+}
+
+.signInDiv, .signUpDiv{
+	float:left;
+	width: 950px;
+	padding: 10px;
+	margin: 5px;
+	margin-top: 30px;
+}
+
+.fieldSpan{
+	font-size: 12pt;
+	color: lightblue;
+}
+
+.warningSpan{
+	font-size: 10pt;
+	color:red;
+}
+
+.confirmButton{
+	margin-top: 20px;
+	margin-bottom: 10px;
+	margin-left: 100px;
+	width: 100px;
+	float:left;
+	cursor: pointer;
+
+}
+
+ul{
+	list-style: none;
+	margin:0;
+	padding: 0;
+
+}
+
+li{
+	margin:0;
+	padding: 0;
+}
+
+input{
+	width: 300px;
+	font-size: 20pt;
+	margin-right: 20px;
+}

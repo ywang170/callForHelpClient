@@ -1,0 +1,14 @@
+.dayContainerShow{
+	float:left;
+	width: 200px;
+}
+
+.dayContainerHide{
+	display:none;
+}
+
+.dateShowing{
+	width:190px;
+	margin-left:5px;
+	float:left;
+}
