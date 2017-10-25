@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import TimeSlotForm from '../questions/TimeSlotForm';
+import TimeSlotForm from '../utility/timeSlotForm/TimeSlotForm';
 
 
 class timeSlotFormTest extends Component{

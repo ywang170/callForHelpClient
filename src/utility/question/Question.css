@@ -1,0 +1,16 @@
+.questionContainer{
+	width:500px;
+	float:left;
+}
+
+.questionTitle{
+	width:490px;
+	float:left;
+	margin-left: 5px;
+}
+
+.questionContent{
+	width:490px;
+	float:left;
+	margin-left: 5px;
+}

@@ -1,0 +1,16 @@
+.TimeSlotFormForAnswerQuestionContainer{
+	position: fixed;
+	z-index: 11;
+	width:800px;
+	background-color: black;
+	left:50%;
+	margin-left: -400px
+}
+
+.TimeSlotFormForAnswerQuestionComment{
+	width:750px;
+	height: 100px;
+	font-size: 14pt;
+	float: left;
+	margin-left: 25px;
+}

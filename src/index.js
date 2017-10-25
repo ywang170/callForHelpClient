@@ -7,7 +7,9 @@ import cookieTest from './test/cookieTest';
 import SignInSignUp from './signInSignUp/SignInSignUp';
 import questions from './questions/Questions';
 import registerServiceWorker from './registerServiceWorker';
-import timeSlotFormTest from './test/timeSlotFormTest'
+import timeSlotFormTest from './test/timeSlotFormTest';
+import questionTest2 from './test/questionTest';
+import ScreenBlockerTest from './test/ScreenBlockerTest'
 
 
 ReactDOM.render(
@@ -18,6 +20,8 @@ ReactDOM.render(
 				<Route path="/questions" component={questions} />
 				<Route path="/cookieTest" component={cookieTest} />
 				<Route path="/timeSlotFormTest" component={timeSlotFormTest} />
+				<Route path='/screenBlockerTest' component={ScreenBlockerTest}/>
+				<Route path="/questionTest2" component={questionTest2} />
 			</div>
 
 		</BrowserRouter>

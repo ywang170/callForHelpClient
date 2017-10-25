@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Day from './Day';
-
+import './TimeSlotForm.css';
 
 /*
 Description: show 4 days with 24*4 = 96 slots at most. Though not every day may show up
@@ -59,7 +59,8 @@ class TimeSlotForm extends Component {
 		var today = new Date();
 		for (var i = 0; i <= this.props.days; i++) {
 			daysToRender.push (
-			<Day ref={"day"+i} key={i} date={today.toLocaleDateString()} availableTimeInstants={this.props.availableTimeInstants} onChoosingATimeSlot={() => this.onChoosingATimeSlot()}  onUnChoosingATimeSlot={() => this.onUnChoosingATimeSlot()} isLastDay={i===this.props.days?true:false}
+			<Day ref={"day"+i} key={i} date={today.toLocaleDateString()} availableTimeInstants={this.props.availableTimeInstants} 
+			onChoosingATimeSlot={(dateTime) => this.onChoosingATimeSlot(dateTime)}  onUnChoosingATimeSlot={(dateTime) => this.onUnChoosingATimeSlot(dateTime)} isLastDay={i===this.props.days?true:false}
 			/>);
 			today.setDate(today.getDate() + 1);
 		}
