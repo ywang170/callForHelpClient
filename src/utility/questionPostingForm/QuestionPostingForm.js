@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import TimeSlotFormForPostingQuestion from './TimeSlotFormForPostingQuestion'
-import InputComponent from './InputComponent';
-import TextareaComponent from './TextareaComponent';
+import InputComponent from '../textInput/InputComponent';
+import TextareaComponent from '../textInput/TextareaComponent';
 import './QuestionPostingForm.css';
 
 /*
@@ -95,8 +95,8 @@ class QuestionPostingForm extends Component {
 
 	submit(){
 		//get value from states
-		var questionTitle = this.refs["title"].returnTitle();
-		var questionContent = this.refs["content"].returnContent();
+		var questionTitle = this.refs["title"].getValue();
+		var questionContent = this.refs["content"].getValue();
 		var questionSlots = Array.from(this.state.chosenTimeSlots);
 		//client validation
 		if (!questionTitle || typeof questionTitle !== 'string' || questionTitle.length < 15 || questionTitle.length > 100) {
@@ -188,8 +188,8 @@ class QuestionPostingForm extends Component {
 	render(){
 		return (
 			<div className="QuestionPostingForm_questionPostingFormContainer">
-				<span>Title: </span><InputComponent ref={"title"} />
-				<TextareaComponent ref={"content"}/>
+				<span>Title: </span><InputComponent ref={"title"} cssClass={"QuestionPostingForm_questionTitle"}/>
+				<TextareaComponent ref={"content"} cssClass={"QuestionPostingForm_questionContent"}/>
 				<TimeSlotFormForPostingQuestion availableTimeSlots={this.state.availableTimeSlots} 
 				onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
 				<button className="QuestionPostingForm_confirm" onClick={()=>this.submit()}>Submit Question!</button>

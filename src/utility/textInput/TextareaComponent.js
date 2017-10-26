@@ -3,36 +3,41 @@ import React, { Component } from 'react';
 /*
 This component exist for efficiency only!!!
 It doesn't even have its own css file...
-only lives with QuestionPostingForm
+
+Props:
+	cssClass - css class
+
+State:
+	value - value
 */
 class TextareaComponent extends Component{
 	constructor(props){
 		super(props);
 
 		this.state= {
-			content:''
+			value:''
 		}
 	}
 
-	updateContent(e) {
+	updateValue(e) {
 		this.setState({
-			content: e.target.value,
+			value: e.target.value,
 		})
 	}
 
-	returnContent(){
-		return this.state.content;
+	getValue(){
+		return this.state.value;
 	}
 
 	clear(){
 		this.setState({
-			content: '',
+			value: '',
 		})
 	}
 
 	render() {
 		return(
-			<textarea className="QuestionPostingForm_questionContent" value={this.state.content} onChange={(e) => this.updateContent(e)} />
+			<textarea className={this.props.cssClass} value={this.state.value} onChange={(e) => this.updateValue(e)} />
 		);
 	}
 }

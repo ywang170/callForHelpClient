@@ -3,36 +3,41 @@ import React, { Component } from 'react';
 /*
 This component exist for efficiency only!!!
 It doesn't even have its own css file...
-only lives with QuestionPostingForm
+
+Props:
+	cssClass - css class
+
+State:
+	value - value
 */
 class InputComponent extends Component{
 	constructor(props){
 		super(props);
 
 		this.state= {
-			title:''
+			value:''
 		}
 	}
 
-	updateTitle(e) {
+	updateValue(e) {
 		this.setState({
-			title: e.target.value,
+			value: e.target.value,
 		})
 	}
 
-	returnTitle(){
-		return this.state.title;
+	getValue(){
+		return this.state.value;
 	}
 
 	clear(){
 		this.setState({
-			title:'',
+			value:'',
 		});
 	}
 
 	render() {
 		return(
-			<input className="QuestionPostingForm_questionTitle" type="text" value={this.state.title} onChange={(e) => this.updateTitle(e)}/>
+			<input className={this.props.cssClass} type="text" value={this.state.value} onChange={(e) => this.updateValue(e)}/>
 		);
 	}
 }
