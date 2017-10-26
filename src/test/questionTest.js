@@ -8,7 +8,7 @@ class questionTest2 extends Component{
 	render(){
 		console.log("wocaoni!");
 		return (
-			<Questions/>
+			<Questions username={"Dante"} />
 		);
 	}
 }

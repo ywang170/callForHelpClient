@@ -1,6 +1,6 @@
 .dayContainerShow{
 	float:left;
-	width: 200px;
+	width: 100px;
 }
 
 .dayContainerHide{
@@ -8,7 +8,12 @@
 }
 
 .dateShowing{
-	width:190px;
-	margin-left:5px;
+	text-align: center;
+	font-size: 12pt;
+	width:100px;
+	height: 25px;
+	margin-bottom: 5px;
+	padding-top: 5px;
+	box-shadow: 0 3px 1px 0 rgba(0,0,0,0.19);
 	float:left;
 }

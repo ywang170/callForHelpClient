@@ -62,7 +62,7 @@ class Day extends Component {
 	*/
 	renderTimeSlot(hourOfTheDay) {
 		//get time to show
-		var timeToShow = (hourOfTheDay+1)+":00"
+		var timeToShow = hourOfTheDay +":00"
 		//get the time instant of this day at this hour (We need to cast it to "time" so it is a UTC time)
 		var timeInstant = new Date(this.props.date + " " + timeToShow).getTime(); 
 		//check if this time instant is available, plus it has to be bigger than now

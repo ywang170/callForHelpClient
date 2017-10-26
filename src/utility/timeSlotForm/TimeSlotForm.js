@@ -74,8 +74,10 @@ class TimeSlotForm extends Component {
 	*/
 	render() {
 		return (
-			<div className="timeSlotFormContainer">
-				{this.renderDays()}
+			<div className="TimeSlotForm_timeSlotFormContainer">
+				<div className="TimeSlotForm_timeSlotFormInnerContainer">
+					{this.renderDays()}
+				</div>
 			</div>
 		);
 	}

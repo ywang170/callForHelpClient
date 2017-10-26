@@ -1,23 +1,33 @@
 .timeSlotAvailable{
-	background-color: green;
-	color:white;
-	width:190px;
+	color:black;
+	width:90px;
 	float: left;
 	margin-left: 5px;
+	font-size: 10pt;
+	height: 17px;
+	text-align: center;
+	border-bottom: 2px solid white;
 }
 
 .timeSlotUnavailable{
-	background-color: darkgray;
-	color: gray;
-	width:190px;
+	color: lightgray;
+	width:90px;
 	float: left;
 	margin-left: 5px;
+	font-size: 10pt;
+	height: 17px;
+	text-align: center;
+	border-bottom: 2px solid white;
 }
 
 .timeSlotChosen{
-	background-color: red;
-	color:white;
-	width:190px;
+	background-color: lightblue;
+	color:black;
+	width:90px;
 	float: left;
 	margin-left: 5px;
+	font-size: 10pt;
+	height: 17px;
+	text-align: center;
+	border-bottom: 2px solid white;
 }

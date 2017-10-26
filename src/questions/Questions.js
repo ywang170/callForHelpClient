@@ -58,7 +58,13 @@ class Questions extends Component {
 			
 		}.bind(this))
 		.then(function(data){
-			questionListTemp = data.questions.slice();
+			for (var i = 0; i < data.questions.length; i++) {
+				var question = data.questions[i];
+				if (question.answererusernames && (question.answererusernames.includes(this.props.username) || question.askerusername === this.props.username)) {
+					continue;
+				}
+				questionListTemp.push(question)
+			}
 			//populate state
 			this.setState({
 				questionList: questionListTemp,

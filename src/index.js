@@ -10,6 +10,7 @@ import registerServiceWorker from './registerServiceWorker';
 import timeSlotFormTest from './test/timeSlotFormTest';
 import questionTest2 from './test/questionTest';
 import ScreenBlockerTest from './test/ScreenBlockerTest'
+import AskQuestionTest from './test/askQuestionTest';
 
 
 ReactDOM.render(
@@ -22,6 +23,7 @@ ReactDOM.render(
 				<Route path="/timeSlotFormTest" component={timeSlotFormTest} />
 				<Route path='/screenBlockerTest' component={ScreenBlockerTest}/>
 				<Route path="/questionTest2" component={questionTest2} />
+				<Route path="/askQuestionTest" component={AskQuestionTest} />
 			</div>
 
 		</BrowserRouter>
