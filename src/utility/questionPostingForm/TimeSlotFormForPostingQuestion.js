@@ -5,11 +5,6 @@ import './TimeSlotFormForPostingQuestion.css'
 
 class TimeSlotFormForPostingQuestion extends Component{
 
-	constructor(props) {
-		super(props);
-
-	}
-
 	render(){
 		return (
 			<TimeSlotForm availableTimeInstants={this.props.availableTimeSlots} onlyOneChoice={false} days={3} 

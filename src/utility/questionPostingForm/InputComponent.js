@@ -24,6 +24,12 @@ class InputComponent extends Component{
 		return this.state.title;
 	}
 
+	clear(){
+		this.setState({
+			title:'',
+		});
+	}
+
 	render() {
 		return(
 			<input className="QuestionPostingForm_questionTitle" type="text" value={this.state.title} onChange={(e) => this.updateTitle(e)}/>

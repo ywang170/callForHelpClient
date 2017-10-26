@@ -9,8 +9,9 @@ a standalone form that can submit a question to system
 
 props:
 	onValidationFail - functions to run when user fails validation
+	onUserBusy - function to run when the user is currently ask questions in another environment
 	onServerError - other than validation fail, if the server returns other error
-	onConfirm - when confirmed. This module will auto send confirmation to db. But in care parent component may want to do somethings like hide module, etc...
+	onSubmit - when submit. This module will auto send submittion to db. But in care parent component may want to do somethings like hide module, etc...
 
 state:
 	title - title of the question
@@ -19,15 +20,25 @@ state:
 
 */
 class QuestionPostingForm extends Component {
+
 	constructor(props) {
 		super(props);
 
 		this.state= {
 			availableTimeSlots: new Set(),
 			chosenTimeSlots: new Set(),
+			refresh: false,
 		}
 	}
+
 	componentWillMount(){
+		this.populating();
+	}
+
+	/*
+	function used to get user time slots and update the state: availableTimeSlots
+	*/
+	populating(){
 		//generate available time slots for next 72 hrs
 		var availableTimeSlotsTemp = new Set();
 		var currDateTime = new Date();
@@ -46,7 +57,6 @@ class QuestionPostingForm extends Component {
 			headers: {"Content-Type": "application/json"}
 		})
 		.then(function(res){
-			console.log(res);
 			if (!res.ok) {
 				switch (res.status) {
 					case 401:
@@ -72,7 +82,10 @@ class QuestionPostingForm extends Component {
 			this.setState({
 				availableTimeSlots: availableTimeSlotsTemp,
 				chosenTimeSlots: new Set(),
+				refresh: !this.state.refresh,
 			})
+			this.refs["title"].clear();
+			this.refs["content"].clear();
 		}.bind(this))
 		.catch(function(err){
 			console.log('get user slot fail');
@@ -80,23 +93,25 @@ class QuestionPostingForm extends Component {
 	}
 
 
-	confirm(){
+	submit(){
+		//get value from states
 		var questionTitle = this.refs["title"].returnTitle();
+		var questionContent = this.refs["content"].returnContent();
+		var questionSlots = Array.from(this.state.chosenTimeSlots);
+		//client validation
 		if (!questionTitle || typeof questionTitle !== 'string' || questionTitle.length < 15 || questionTitle.length > 100) {
 			console.log('question title in wrong form');
 			return;
-		}
-		var questionContent = this.refs["content"].returnContent();
+		}		
 		if (!questionContent || typeof questionContent !== 'string' || questionContent.length < 15 || questionContent.length > 2000) {
 			console.log('question content in wrong form');
 			return;
 		}
-		var questionSlots = Array.from(this.state.chosenTimeSlots);
 		if (!questionSlots || !Array.isArray(questionSlots) || questionSlots.length < 1 || questionSlots.length > 72) {
 			console.log('chosen slots in wrong form');
 			return;
 		}
-		//send confirmation to database
+		//send submittion to database
 		fetch('/setQuestions/create', {
 			method: "POST",
 			mode: 'cors',
@@ -111,10 +126,10 @@ class QuestionPostingForm extends Component {
 		.then(function(res){
 			if (!res.ok) {
 				switch (res.status) {
-					case 401: //bad input
+					case 401: //validation fail
 						this.props.onValidationFail();
 						break;
-					case 423:
+					case 423://user is currently asking in another environment
 						console.log("user is asking question in another environment");
 						break;
 					default:  //other error, usually 500
@@ -127,12 +142,13 @@ class QuestionPostingForm extends Component {
 			
 		}.bind(this))
 		.then(function(data){
-			console.log(data);
-			//navigate user to main page
-		})
+			console.log("question successfully submitted! now refreshing!");
+			this.populating();
+		}.bind(this))
 		.catch(function(err){
 			console.log('submit question fail');
 		});
+		this.props.onSubmit();
 	}
 
 	onChoosingATimeSlot(timeSlot){
@@ -160,13 +176,13 @@ class QuestionPostingForm extends Component {
 	}
 
 	/*
-	if only chosen time is updated, then do not update
+	if only refreshes when reloading everything
 	*/
 	shouldComponentUpdate(nextProps, nextState){
-		if (this.state.chosenTimeSlots.length != nextState.chosenTimeSlots.length && this.state.availableTimeSlots.length == nextState.availableTimeSlots.length) {
-			return false;
+		if (this.state.refresh !== nextState.refresh) {
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 	render(){
@@ -176,7 +192,7 @@ class QuestionPostingForm extends Component {
 				<TextareaComponent ref={"content"}/>
 				<TimeSlotFormForPostingQuestion availableTimeSlots={this.state.availableTimeSlots} 
 				onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
-				<button className="QuestionPostingForm_confirm" onClick={()=>this.confirm()}>Submit Question!</button>
+				<button className="QuestionPostingForm_confirm" onClick={()=>this.submit()}>Submit Question!</button>
 			</div>
 		);
 	}

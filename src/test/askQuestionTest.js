@@ -12,9 +12,17 @@ class AskQuestionTest extends Component{
 		console.log("server error")
 	}
 
+	onSubmit(){
+
+	}
+
+	onUserBusy(){
+
+	}
+
 	render(){
 		return (
-			<QuestionPostingForm onValidationFail={()=>this.onValidationFail()} onServerError={()=>this.onServerError()} />
+			<QuestionPostingForm onValidationFail={()=>this.onValidationFail()} onServerError={()=>this.onServerError()} onSubmit={()=>this.onSubmit()} onUserBusy={()=>this.onUserBusy()}/>
 		);
 	}
 }

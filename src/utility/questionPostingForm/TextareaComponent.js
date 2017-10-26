@@ -24,6 +24,12 @@ class TextareaComponent extends Component{
 		return this.state.content;
 	}
 
+	clear(){
+		this.setState({
+			content: '',
+		})
+	}
+
 	render() {
 		return(
 			<textarea className="QuestionPostingForm_questionContent" value={this.state.content} onChange={(e) => this.updateContent(e)} />
