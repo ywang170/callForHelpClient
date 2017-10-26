@@ -7,6 +7,12 @@
 	height: 17px;
 	text-align: center;
 	border-bottom: 2px solid white;
+	cursor: pointer;
+}
+
+.timeSlotAvailable:hover{
+	color:white;
+	background-color: rgb(50,50,50);
 }
 
 .timeSlotUnavailable{
@@ -30,4 +36,5 @@
 	height: 17px;
 	text-align: center;
 	border-bottom: 2px solid white;
+	cursor: pointer;
 }

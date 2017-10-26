@@ -103,17 +103,11 @@ class QuestionPostingForm extends Component {
 	render(){
 		return (
 			<div className="QuestionPostingForm_questionPostingFormContainer">
-				<div className="QuestionPostingForm_questionInfoArea">
-					<input className="QuestionPostingForm_questionTitle" type="text" value={this.state.title} onChange={(e) => this.updateTitle(e)}/>
-					<textarea className="QuestionPostingForm_questionContent" value={this.state.content} onChange={(e) => this.updateContent(e)} />
-					<div className="QuestionPostingForm_timeSlotFormContainer">
-						<TimeSlotFormForPostingQuestion availableTimeSlots={this.state.availableTimeSlots} 
-						onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
-					</div>
-				</div>
-				<div className="QuestionPostingForm_confirm">
-					<button className="QuestionPostingForm_confirmButton" onClick={()=>this.confirm()}>Confirm</button>
-				</div>
+				<span>Title: </span><input className="QuestionPostingForm_questionTitle" type="text" value={this.state.title} onChange={(e) => this.updateTitle(e)}/>
+				<textarea className="QuestionPostingForm_questionContent" value={this.state.content} onChange={(e) => this.updateContent(e)} />
+				<TimeSlotFormForPostingQuestion availableTimeSlots={this.state.availableTimeSlots} 
+				onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
+				<button className="QuestionPostingForm_confirm" onClick={()=>this.confirm()}>Submit Question!</button>
 			</div>
 		);
 	}

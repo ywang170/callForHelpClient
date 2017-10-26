@@ -1,18 +1,23 @@
 .QuestionPostingForm_questionPostingFormContainer{
 	float:left;
 	width:950px;
-	padding-left: 5px;
+	padding-left: 10px;
+	height: 630px;
+	background-color: rgb(249,231,159);
+	border-radius: 15px;
 }
 
-.QuestionPostingForm_questionInfoArea{
-	width:940px;
-	height: 500px;
-	float:left;
+.QuestionPostingForm_questionPostingFormContainer span{
+	margin-left: 20px;
+	font-size: 12pt;
 }
 
+.QuestionPostingForm_questionPostingFormContainer textarea{
+	resize: none;
+}
 
 .QuestionPostingForm_questionTitle{
-	width:940px;
+	width:835px;
 	margin-top: 10px;
 	margin-bottom: 10px;
 	height:20px;
@@ -21,27 +26,32 @@
 
 .QuestionPostingForm_questionContent{
 	width:450px;
-	margin-left: 10px;
-	float:left;
-	height: 500px;
-}
-
-.QuestionPostingForm_questionContent{
-
-}
-
-.QuestionPostingForm_timeSlotFormContainer{
-	width: 450px;
-	height: 500px;
-	padding-left: 5px;
 	margin-left: 20px;
+	margin-right: 10px;
 	float:left;
+	height: 500px;
 }
+
 
 .QuestionPostingForm_confirm{
-	width:940px;
-	height: 50px;
+	width:900px;
+	margin-left: 18px;
+	height: 40px;
 	float:left;
-	margin-top: 10px;
+	margin-top: 15px;
+	font-size: 16pt;
+	font-style: italic;
+	font-weight: bold;
+	color: white;
 	margin-bottom: 10px;
+	background-color: lightgreen;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+	border-radius: 15px;
+	border:none;
+	cursor: pointer;
+}
+
+.QuestionPostingForm_confirm:hover {
+	background-color: palegreen;
 }
