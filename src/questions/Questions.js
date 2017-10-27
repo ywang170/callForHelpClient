@@ -91,10 +91,10 @@ class Questions extends Component {
 			screenBlocked: true
 		})
 		//current available slots
-		var availableTimeInstants = new Set();
+		var availableTimeSlots = new Set();
 		for (var i = 0; i < slots.length; i++) {
 			var slotInstant = new Date(slots[i]).getTime();
-			availableTimeInstants.add(slotInstant);
+			availableTimeSlots.add(slotInstant);
 		}
 		fetch('/getSlots/simple/'+askerUsername, {
 			method: "GET",
@@ -121,12 +121,12 @@ class Questions extends Component {
 		.then(function(data){
 			for (var i = 0; i < data.slots.length; i++) {
 				var takenSlotInstant = new Date(data.slots[i].time).getTime();
-				if (availableTimeInstants.has(takenSlotInstant)) {
-					availableTimeInstants.delete(takenSlotInstant);
+				if (availableTimeSlots.has(takenSlotInstant)) {
+					availableTimeSlots.delete(takenSlotInstant);
 				}
 			}
 			//show time slot form
-			this.refs["timeSlotFormForAnswerQuestion"].show(questionId, availableTimeInstants);
+			this.refs["timeSlotFormForAnswerQuestion"].show(questionId, availableTimeSlots);
 		}.bind(this))
 		.catch(function(err){
 			

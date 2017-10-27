@@ -6,7 +6,7 @@ import './Day.css';
 Description: show 24 time slot
 Props: 	
 	date - date of this day, in the format of a date string like "April 16, 2017" or "04/15/1994", it is LOCAL TIME!
-	availableTimeInstants - set of time slots that are available, in time instant, which is a number
+	availableTimeSlots - set of time slots that are available, in time instant, which is a number
 	onChoosingATimeSlot - will be passed into each time slot as the onClick function
 	onUnChoosingATimeSlot - on choose the chosen time slot again
 	isLastDay - if this day is the last day on time slot form. Only the last day has the ability to hide
@@ -66,7 +66,7 @@ class Day extends Component {
 		//get the time instant of this day at this hour (We need to cast it to "time" so it is a UTC time)
 		var timeInstant = new Date(this.props.date + " " + timeToShow).getTime(); 
 		//check if this time instant is available, plus it has to be bigger than now
-		if (this.props.availableTimeInstants.has(timeInstant) && timeInstant > new Date().getTime()) {
+		if (this.props.availableTimeSlots.has(timeInstant) && timeInstant > new Date().getTime()) {
 			return (
 				<TimeSlot ref={"timeSlot"+hourOfTheDay} time={timeToShow} date={this.props.date} available={true} onChoose={this.props.onChoosingATimeSlot} onUnChoose={this.props.onUnChoosingATimeSlot}
 				/>

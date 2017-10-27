@@ -15,7 +15,6 @@ import AskQuestionTest from './test/askQuestionTest';
 ReactDOM.render(
 		<BrowserRouter>
 			<div>
-				<Route path="/" component={SignInSignUp} />
 				<Route path="/signInSignUp" component={SignInSignUp} />
 				<Route path="/questions" component={questions} />
 				<Route path="/cookieTest" component={cookieTest} />

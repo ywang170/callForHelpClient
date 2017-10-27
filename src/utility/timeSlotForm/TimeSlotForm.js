@@ -7,7 +7,7 @@ Description: show 4 days with 24*4 = 96 slots at most. Though not every day may 
 Props: 	
 	onChoosingATimeSlot - processing picking a time slot. System calling time slot form should be responsible for logic
 	onUnChoosingATimeSlot - processing click again to cancel. System calling time slot form should be responsible for logic
-	availableTimeInstants - time instant in number that is available
+	availableTimeSlots - time instant in number that is available
 	onlyOneChoice - is the form only allows one choice
 	days -how many days to show (But actually we show days+1)
 	
@@ -39,6 +39,15 @@ class TimeSlotForm extends Component {
 	}
 
 	/*
+	clear all slots
+	*/
+	clear() {
+		for(var i = 0;i <= this.props.days; i++) {
+			this.refs["day"+i].cleanChosen();
+		}
+	}
+
+	/*
 	function to run when a time slot is unchosen
 
 	Params:
@@ -59,7 +68,7 @@ class TimeSlotForm extends Component {
 		var today = new Date();
 		for (var i = 0; i <= this.props.days; i++) {
 			daysToRender.push (
-			<Day ref={"day"+i} key={i} date={today.toLocaleDateString()} availableTimeInstants={this.props.availableTimeInstants} 
+			<Day ref={"day"+i} key={i} date={today.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} 
 			onChoosingATimeSlot={(dateTime) => this.onChoosingATimeSlot(dateTime)}  onUnChoosingATimeSlot={(dateTime) => this.onUnChoosingATimeSlot(dateTime)} isLastDay={i===this.props.days?true:false}
 			/>);
 			today.setDate(today.getDate() + 1);

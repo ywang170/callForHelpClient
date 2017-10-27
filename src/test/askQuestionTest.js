@@ -22,7 +22,7 @@ class AskQuestionTest extends Component{
 
 	render(){
 		return (
-			<QuestionPostingForm onValidationFail={()=>this.onValidationFail()} onServerError={()=>this.onServerError()} onSubmit={()=>this.onSubmit()} onUserBusy={()=>this.onUserBusy()}/>
+			<QuestionPostingForm onValidationFail={()=>this.onValidationFail()} onServerError={()=>this.onServerError()} onUserBusy={()=>this.onUserBusy()}/>
 		);
 	}
 }

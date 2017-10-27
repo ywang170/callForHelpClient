@@ -11,17 +11,17 @@ class TimeSlotFormForAnswerQuestion extends Component{
 
 		this.state= {
 			show: false,
-			availableTimeInstants: [],
+			availableTimeSlots: [],
 			questionId:'',
 			timeSlotChosen:'',
 			comment:'',
 		}
 	}
 
-	show(questionId, availableTimeInstants){
+	show(questionId, availableTimeSlots){
 		this.setState({
 			questionId: questionId,
-			availableTimeInstants: availableTimeInstants,
+			availableTimeSlots: availableTimeSlots,
 			show: true,
 		});
 	}
@@ -74,7 +74,7 @@ class TimeSlotFormForAnswerQuestion extends Component{
 						<div>
 							<ScreenBlocker onClick={() => this.off()}/>
 							<div className="TimeSlotFormForAnswerQuestionContainer">
-								<TimeSlotForm availableTimeInstants={this.state.availableTimeInstants} onlyOneChoice={true} days={3} 
+								<TimeSlotForm availableTimeSlots={this.state.availableTimeSlots} onlyOneChoice={true} days={3} 
 							onChoosingATimeSlot={(dateTime) => this.onChoosingATimeSlot(dateTime)} onUnChoosingATimeSlot={(dateTime) => this.onUnChoosingATimeSlot(dateTime)}/>
 								<textarea className="TimeSlotFormForAnswerQuestionComment" type="text" value = {this.state.comment} onChange={(e) => this.updateComment(e)}/>
 								<button className="TimeSlotFormForAnswerQuestionConfirmButton" onClick={() => this.confirm()}>Confirm</button>

@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
-import TimeSlotFormForPostingQuestion from './TimeSlotFormForPostingQuestion'
+import TimeSlotForm from '../timeSlotForm/TimeSlotForm'
 import InputComponent from '../textInput/InputComponent';
 import TextareaComponent from '../textInput/TextareaComponent';
+import ScreenBlocker from '../screenBlocker/ScreenBlocker'
 import './QuestionPostingForm.css';
 
 /*
 a standalone form that can submit a question to system
+It contains:
+	a title input 
+	a content textarea
+	a time slot form to choose available time
+	a submit button
+It will automatically load user slots and on error can have some basic handlings
+It doesn't contain a screenblocker, so it can be used both as a popup or as part of the web page
 
 props:
 	onValidationFail - functions to run when user fails validation
@@ -14,9 +22,10 @@ props:
 	onSubmit - when submit. This module will auto send submittion to db. But in care parent component may want to do somethings like hide module, etc...
 
 state:
-	title - title of the question
-	content - content of the question
-	slots - list of Date in instant number
+	availableTimeSlots - available time slots for new question,
+	chosenTimeSlots - currently chosen time slot,
+	refresh - should refresh only when this state changes. It is a signal, if it is not changed then view will not refresh
+	blockScreen - if screen is blocked or not
 
 */
 class QuestionPostingForm extends Component {
@@ -28,6 +37,7 @@ class QuestionPostingForm extends Component {
 			availableTimeSlots: new Set(),
 			chosenTimeSlots: new Set(),
 			refresh: false,
+			screenBlocked: false,
 		}
 	}
 
@@ -37,8 +47,11 @@ class QuestionPostingForm extends Component {
 
 	/*
 	function used to get user time slots and update the state: availableTimeSlots
+
+	Params:
+		shouldUnblockScreen - should unblock the screen?
 	*/
-	populating(){
+	populating(shouldUnblockScreen){
 		//generate available time slots for next 72 hrs
 		var availableTimeSlotsTemp = new Set();
 		var currDateTime = new Date();
@@ -57,13 +70,18 @@ class QuestionPostingForm extends Component {
 			headers: {"Content-Type": "application/json"}
 		})
 		.then(function(res){
+			//handle errors
 			if (!res.ok) {
 				switch (res.status) {
 					case 401:
-						this.props.onValidationFail();
+						if(this.props.onValidationFail){
+							this.props.onValidationFail();
+						}						
 						break;
 					default:  //other error, usually 500
-						this.props.onServerError();
+						if (this.props.onServerError) {
+							this.props.onServerError();
+						}						
 						break;
 				}
 				throw new Error('get user slot fail');
@@ -72,6 +90,7 @@ class QuestionPostingForm extends Component {
 			
 		}.bind(this))
 		.then(function(data){
+			//get unavailable time slots out of available time
 			for (var i = 0; i < data.slots.length; i++) {
 				var takenSlotInstant = new Date(data.slots[i].time).getTime();
 				if (availableTimeSlotsTemp.has(takenSlotInstant)) {
@@ -82,17 +101,43 @@ class QuestionPostingForm extends Component {
 			this.setState({
 				availableTimeSlots: availableTimeSlotsTemp,
 				chosenTimeSlots: new Set(),
+				screenBlocked: shouldUnblockScreen? false: this.state.screenBlocked,
 				refresh: !this.state.refresh,
 			})
 			this.refs["title"].clear();
 			this.refs["content"].clear();
+			this.refs["timeSlotForm"].clear();
 		}.bind(this))
 		.catch(function(err){
+			//on error. We don't populate here because it would be horrible if we keep populating
 			console.log('get user slot fail');
 		});
 	}
 
 
+	/*
+	block screen
+	*/
+	blockScreen(){
+		this.setState({
+			screenBlocked: true,
+			refresh: !this.state.refresh
+		})
+	}
+
+	/*
+	block screen
+	*/
+	unblockScreen(){
+		this.setState({
+			screenBlocked: false,
+			refresh: !this.state.refresh
+		})
+	}
+
+	/*
+	submit question create request to server
+	*/
 	submit(){
 		//get value from states
 		var questionTitle = this.refs["title"].getValue();
@@ -111,6 +156,8 @@ class QuestionPostingForm extends Component {
 			console.log('chosen slots in wrong form');
 			return;
 		}
+		//block screen
+		this.blockScreen();
 		//send submittion to database
 		fetch('/setQuestions/create', {
 			method: "POST",
@@ -127,13 +174,19 @@ class QuestionPostingForm extends Component {
 			if (!res.ok) {
 				switch (res.status) {
 					case 401: //validation fail
-						this.props.onValidationFail();
+						if (this.props.onValidationFail){
+							this.props.onValidationFail();
+						}						
 						break;
 					case 423://user is currently asking in another environment
-						console.log("user is asking question in another environment");
+						if (this.props.onUserBusy) {
+							this.props.onUserBusy();
+						}						
 						break;
 					default:  //other error, usually 500
-						this.props.onServerError();
+						if (this.props.onServerError) {
+							this.props.onServerError();
+						}						
 						break;
 				}
 				throw new Error('submit question fail');
@@ -143,14 +196,24 @@ class QuestionPostingForm extends Component {
 		}.bind(this))
 		.then(function(data){
 			console.log("question successfully submitted! now refreshing!");
-			this.populating();
+			this.populating(true);
 		}.bind(this))
 		.catch(function(err){
 			console.log('submit question fail');
+			//no matter if user is busy, server error or validation fail, we should not refresh but should lower the shield
+			this.unblockScreen();
 		});
-		this.props.onSubmit();
+		if (this.props.onSubmit) {
+			this.props.onSubmit();
+		}						
 	}
 
+	/*
+	when a time slot is chosen, update state
+
+	Params:
+		timeSLot - time instant of the time slot
+	*/
 	onChoosingATimeSlot(timeSlot){
 		if (this.state.chosenTimeSlots.has(timeSlot)) {
 			return true;
@@ -163,6 +226,12 @@ class QuestionPostingForm extends Component {
 		return true;
 	}
 
+	/*
+	when a time slot is unchosen, update state
+
+	Params:
+		timeSLot - time instant of the time slot
+	*/
 	onUnChoosingATimeSlot(timeSlot){
 		if (!this.state.chosenTimeSlots.has(timeSlot)) {
 			return true;
@@ -176,7 +245,7 @@ class QuestionPostingForm extends Component {
 	}
 
 	/*
-	if only refreshes when reloading everything
+	only refreshes when populating everything
 	*/
 	shouldComponentUpdate(nextProps, nextState){
 		if (this.state.refresh !== nextState.refresh) {
@@ -188,9 +257,10 @@ class QuestionPostingForm extends Component {
 	render(){
 		return (
 			<div className="QuestionPostingForm_questionPostingFormContainer">
+				{this.state.screenBlocked? <ScreenBlocker/>: null}
 				<span>Title: </span><InputComponent ref={"title"} cssClass={"QuestionPostingForm_questionTitle"}/>
 				<TextareaComponent ref={"content"} cssClass={"QuestionPostingForm_questionContent"}/>
-				<TimeSlotFormForPostingQuestion availableTimeSlots={this.state.availableTimeSlots} 
+				<TimeSlotForm  ref="timeSlotForm" availableTimeSlots={this.state.availableTimeSlots} onlyOneChoice={false} days={3} 
 				onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
 				<button className="QuestionPostingForm_confirm" onClick={()=>this.submit()}>Submit Question!</button>
 			</div>
