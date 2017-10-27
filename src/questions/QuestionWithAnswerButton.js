@@ -11,8 +11,8 @@ States:
 Props: 	
 	title - question title
 	content - question content
-	questionId - id of the question
-	slots - slot available for this question
+	questionId - id of the question, kept here mostly because we need to pass back to parent
+	slots - slot available for this question, kept here mostly because we need to pass back to parent
 	askerUsername - username of the author
 	onAnswerQuestion - on this question being answered, parent will be notified and popup the time slot form
 */
@@ -24,9 +24,9 @@ class QuestionWithAnswerButton extends Component {
 
 	render() {
 		return (
-			<div className="questionWithAnswerButtonContainer">
+			<div className="QuestionWithAnswerButton_questionWithAnswerButtonContainer">
 				<Question title={this.props.title} content={this.props.content} askerUsername={this.props.askerUsername} />
-				<button className="answerQuestionButton" onClick={() => this.onAnswerQuestion()}>I can help!</button>
+				<button className="QuestionWithAnswerButton_answerQuestionButton" onClick={() => this.onAnswerQuestion()}>Y e s</button>
 			</div>
 		);
 	}

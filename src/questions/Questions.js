@@ -7,17 +7,17 @@ import './Questions.css';
 
 /*
 List of questions 
-This can be a stand alone app
+This can be a stand alone page
 It can be reponsible for loading questions, showing questions
 
 States:
-	latestQuestionId: id of the latest question, used to load newer questions
-	oldestQuestionId: id of the oldest question, used to load older questions
-	questionList: list of all questions
-	autoRefreshBlocking: if refreshing(getting more questions) is currently blocked
-
-Props:
-	userSlots: time slots that are already taken for the user. Used to filter 
+	latestQuestionId - id of the latest question, used to load newer questions
+	oldestQuestionId - id of the oldest question, used to load older questions
+	questionList - list of all questions
+	showTimeSlotForm - if time slot form is shown
+	timeSlotFormQuestionId - question id of the question that is open
+	timeSlotFormAvailableTimeSlot - available time slot for the question
+	username - username
 */
 class Questions extends Component {
 
@@ -25,11 +25,16 @@ class Questions extends Component {
 		super(props);
 
 		this.state= {
+			//keep information for questions
 			latestQuestionId: 0,
 			oldestQuestionId: 0,
 			questionList: [],
-			autoRefreshBlocked: false,
-			screenBlocked: false,
+			//keep information for time slots
+			showTimeSlotForm: false,
+			timeSlotFormQuestionId: '',
+			timeSlotFormAvailableTimeSlot: '',
+			//user info
+			username: '',
 		}
 	}
 
@@ -58,9 +63,10 @@ class Questions extends Component {
 			
 		}.bind(this))
 		.then(function(data){
+			var username = data.username;
 			for (var i = 0; i < data.questions.length; i++) {
 				var question = data.questions[i];
-				if (question.answererusernames && (question.answererusernames.includes(this.props.username) || question.askerusername === this.props.username)) {
+				if ((question.answererusernames && (question.answererusernames.includes(username)) || question.askerusername === username)) {
 					continue;
 				}
 				questionListTemp.push(question)
@@ -68,7 +74,11 @@ class Questions extends Component {
 			//populate state
 			this.setState({
 				questionList: questionListTemp,
+				username: username,
+
 			});
+			//keep loading questions every a while
+			setTimeout(this.loadLaterQuestions.bind(this), 60000);
 			
 		}.bind(this))
 		.catch(function(err){
@@ -76,20 +86,22 @@ class Questions extends Component {
 		});
 	}
 
+	/*
+	Load more older questions and update oldatesQuestionId
+	*/
 	loadOlderQuestions(){
 		
 	}
 
+	/*
+	Load more newer questions and update latestQuestionId
+	*/
 	loadLaterQuestions(){
-
+		console.log("loading more recent questions");
+		setTimeout(this.loadLaterQuestions.bind(this), 60000);
 	}
 
 	onAnswerQuestion(questionId, slots, askerUsername){
-		//block auto-refreshing
-		this.setState({
-			autoRefreshBlocked: true,
-			screenBlocked: true
-		})
 		//current available slots
 		var availableTimeSlots = new Set();
 		for (var i = 0; i < slots.length; i++) {
@@ -112,7 +124,6 @@ class Questions extends Component {
 					default:  //other error, usually 500
 						break;
 				}
-				console.log('get user slot fail');
 				throw new Error('get user slot fail');
 			}
 			return res.json();
@@ -126,7 +137,11 @@ class Questions extends Component {
 				}
 			}
 			//show time slot form
-			this.refs["timeSlotFormForAnswerQuestion"].show(questionId, availableTimeSlots);
+			this.setState({
+				timeSlotFormQuestionId: questionId,
+				timeSlotFormAvailableTimeSlot: availableTimeSlots,
+				showTimeSlotForm: true,
+			});
 		}.bind(this))
 		.catch(function(err){
 			
@@ -140,9 +155,18 @@ class Questions extends Component {
 
 		//block auto-refreshing
 		this.setState({
-			autoRefreshBlocked: false,
-			screenBlocked: false,
+			showTimeSlotForm: false,
 		})
+	}
+
+	onCancelAnswerQuestion(){
+		this.setState({
+			showTimeSlotForm: false,
+		});
+	}
+
+	shouldComponentUpdate(nextProps, nextState){
+		return true;
 	}
 
 	renderQuestions(){
@@ -151,7 +175,7 @@ class Questions extends Component {
 			var question = this.state.questionList[i];
 
 			questionsToRender.push(
-				<QuestionWithAnswerButton key={i} title={question.title} content={question.content} questionId={question.questionid} 
+				<QuestionWithAnswerButton key={question.questionid} title={question.title} content={question.content} questionId={question.questionid} 
 				slots={question.slots} askerUsername={question.askerusername} onAnswerQuestion={(questionId, slots, askerUsername) => this.onAnswerQuestion(questionId, slots, askerUsername)}/>
 			);
 		}
@@ -162,8 +186,10 @@ class Questions extends Component {
 		return (
 			<div className="QuestionsContainer">
 				{this.renderQuestions()}
-				<TimeSlotFormForAnswerQuestion ref={"timeSlotFormForAnswerQuestion"} onConfirmTime={(dateTime, questionId, comment) => this.onTimeSlotFormConfirmTime(dateTime, questionId, comment)}/>
-				<div className="LoadOlderQuestionsButton" onClick={() => this.loadOlderQuestions()}>load older</div>
+				<TimeSlotFormForAnswerQuestion show={this.state.showTimeSlotForm} availableTimeSlots={this.state.timeSlotFormAvailableTimeSlot} 
+				onConfirmTime={(dateTime, comment) => this.onTimeSlotFormConfirmTime(dateTime, this.state.timeSlotFormQuestionId, comment)}
+				onCancelAnswerQuestion = {()=>this.onCancelAnswerQuestion()}/>
+				<div className="LoadOlderQuestionsButton" onClick={() => this.loadOlderQuestions()}>Load me more questions</div>
 			</div>
 		);
 	}

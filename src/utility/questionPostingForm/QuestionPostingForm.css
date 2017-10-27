@@ -5,6 +5,7 @@
 	height: 630px;
 	background-color: rgb(249,231,159);
 	border-radius: 15px;
+	position: relative;
 }
 
 .QuestionPostingForm_questionPostingFormContainer span{
@@ -21,15 +22,17 @@
 	margin-top: 10px;
 	margin-bottom: 10px;
 	height:20px;
-	font-size: 12pt
+	font-size: 14pt
 }
 
 .QuestionPostingForm_questionContent{
-	width:450px;
+	width:434px;
+	padding:5px;
 	margin-left: 20px;
 	margin-right: 10px;
 	float:left;
-	height: 500px;
+	height: 490px;
+	font-size: 11pt;
 }
 
 

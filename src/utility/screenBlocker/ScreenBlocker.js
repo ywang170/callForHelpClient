@@ -15,12 +15,13 @@ usually used in two ways:
 
 Props:
 	onClick - on click function from parents. For example, you can let the screen block to be gone
+	blockParentOnly - if this set to true, insread of blocking the entire screen we block just the action it self
 */
 class ScreenBlocker extends Component{
 
 	render(){
 		return (
-			<div className="screenBlocker" onClick={this.props.onClick}></div>
+			<div className={this.props.blockParentOnly?"ScreenBlocker_parentBlocker": "ScreenBlocker_screenBlocker"} onClick={this.props.onClick}></div>
 		);
 	}
 }

@@ -22,6 +22,7 @@ props:
 	onServerError - other than validation fail, if the server returns other error
 	onSubmit - when submit. This module will auto send submittion to db. But in care parent component may want to do somethings like hide module, etc...
 	onSuccessful - when submission succeed
+	shouldShowMessage - if this is true then show message. Otherwise parent should be responsible for showing messages
 
 state:
 	availableTimeSlots - available time slots for new question,
@@ -147,11 +148,11 @@ class QuestionPostingForm extends Component {
 		var questionContent = this.refs["content"].getValue();
 		var questionSlots = Array.from(this.state.chosenTimeSlots);
 		//client validation
-		if (!questionTitle || typeof questionTitle !== 'string' || questionTitle.length < 15 || questionTitle.length > 100) {
+		if (!questionTitle || typeof questionTitle !== 'string' || questionTitle.length < 15 || questionTitle.length > 200) {
 			console.log('question title in wrong form');
 			return;
 		}		
-		if (!questionContent || typeof questionContent !== 'string' || questionContent.length < 15 || questionContent.length > 2000) {
+		if (!questionContent || typeof questionContent !== 'string' || questionContent.length > 3000) {
 			console.log('question content in wrong form');
 			return;
 		}
@@ -184,15 +185,17 @@ class QuestionPostingForm extends Component {
 					case 423://user is currently asking in another environment
 						if (this.props.onUserBusy) {
 							this.props.onUserBusy();
-						} else {
+						} 
+						if (this.props.shouldShowMessage) {
 							this.refs["popupAlert"].showMessage("the same user is submitting a question now in another environment...\nPlease try again later!", 3000);		
 						}										
 						break;
 					default:  //other error, usually 500
 						if (this.props.onServerError) {
 							this.props.onServerError();
-						} else {
-							this.refs["popupAlert"].showMessage("question submission failed for server problem!", 3000);					
+						} 
+						if (this.props.shouldShowMessage) {
+							this.refs["popupAlert"].showMessage("question submission failed for server error!", 3000);					
 						}	
 						break;
 				}
@@ -205,7 +208,8 @@ class QuestionPostingForm extends Component {
 			console.log("question successfully submitted! now refreshing!");
 			if (this.props.onSuccessful) {
 				this.props.onSuccessful();
-			} else {
+			} 
+			if (this.props.shouldShowMessage) {
 				this.refs["popupAlert"].showMessage("your question is submitted!", 3000);
 			}
 			this.populating(true);
@@ -275,7 +279,7 @@ class QuestionPostingForm extends Component {
 				onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
 				<button className="QuestionPostingForm_confirm" onClick={()=>this.submit()}>Submit Question!</button>
 
-				{this.state.screenBlocked? <ScreenBlocker/>: null}
+				{this.state.screenBlocked? <ScreenBlocker blockParentOnly={true}/>: null}
 				<PopupAlert ref="popupAlert"/>
 			</div>
 		);
