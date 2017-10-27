@@ -3,7 +3,11 @@ import Day from './Day';
 import './TimeSlotForm.css';
 
 /*
-Description: show 4 days with 24*4 = 96 slots at most. Though not every day may show up
+show 4 days with 24*4 = 96 slots at most. Though not every day may show up
+This component is like a convenient input receiver
+it doesn't deal with logic or server interaction at all
+Just reflect what user chooses and tell parent component
+
 Props: 	
 	onChoosingATimeSlot - processing picking a time slot. System calling time slot form should be responsible for logic
 	onUnChoosingATimeSlot - processing click again to cancel. System calling time slot form should be responsible for logic
@@ -40,6 +44,9 @@ class TimeSlotForm extends Component {
 
 	/*
 	clear all slots
+	Called by parent
+	We make it a parent call functions because it is not always needed. 
+	Sometimes we will just leave the time slot form and remove it from virtual DOM from parent
 	*/
 	clear() {
 		for(var i = 0;i <= this.props.days; i++) {

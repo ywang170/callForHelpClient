@@ -1,0 +1,24 @@
+.PopupAlert_banner{
+	z-index: 15;
+	position: fixed;
+	right:0;
+	left:0;
+	top:200px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 600px;
+	text-align: center;
+	background-color: rgba(30,30,30,0.75);
+	border-radius: 15px;
+	font-size: 14pt;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	color:white;
+
+	animation: fadeInAndOut 3s;
+}
+
+@keyframes fadeInAndOut{
+	0%, 100% {opacity: 0;}
+	50% {opacity: 1;}
+}

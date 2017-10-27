@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import TimeSlotForm from '../timeSlotForm/TimeSlotForm'
 import InputComponent from '../textInput/InputComponent';
 import TextareaComponent from '../textInput/TextareaComponent';
-import ScreenBlocker from '../screenBlocker/ScreenBlocker'
+import ScreenBlocker from '../screenBlocker/ScreenBlocker';
+import PopupAlert from '../popupAlert/PopupAlert';
 import './QuestionPostingForm.css';
 
 /*
@@ -20,6 +21,7 @@ props:
 	onUserBusy - function to run when the user is currently ask questions in another environment
 	onServerError - other than validation fail, if the server returns other error
 	onSubmit - when submit. This module will auto send submittion to db. But in care parent component may want to do somethings like hide module, etc...
+	onSuccessful - when submission succeed
 
 state:
 	availableTimeSlots - available time slots for new question,
@@ -181,12 +183,16 @@ class QuestionPostingForm extends Component {
 					case 423://user is currently asking in another environment
 						if (this.props.onUserBusy) {
 							this.props.onUserBusy();
-						}						
+						} else {
+							this.refs["popupAlert"].showMessage("the same user is submitting a question now in another environment...\nPlease try again later!", 3000);		
+						}										
 						break;
 					default:  //other error, usually 500
 						if (this.props.onServerError) {
 							this.props.onServerError();
-						}						
+						} else {
+							this.refs["popupAlert"].showMessage("question submission failed for server problem!", 3000);					
+						}	
 						break;
 				}
 				throw new Error('submit question fail');
@@ -196,6 +202,11 @@ class QuestionPostingForm extends Component {
 		}.bind(this))
 		.then(function(data){
 			console.log("question successfully submitted! now refreshing!");
+			if (this.props.onSuccessful) {
+				this.props.onSuccessful();
+			} else {
+				this.refs["popupAlert"].showMessage("your question is submitted!", 3000);
+			}
 			this.populating(true);
 		}.bind(this))
 		.catch(function(err){
@@ -257,12 +268,14 @@ class QuestionPostingForm extends Component {
 	render(){
 		return (
 			<div className="QuestionPostingForm_questionPostingFormContainer">
-				{this.state.screenBlocked? <ScreenBlocker/>: null}
 				<span>Title: </span><InputComponent ref={"title"} cssClass={"QuestionPostingForm_questionTitle"}/>
 				<TextareaComponent ref={"content"} cssClass={"QuestionPostingForm_questionContent"}/>
 				<TimeSlotForm  ref="timeSlotForm" availableTimeSlots={this.state.availableTimeSlots} onlyOneChoice={false} days={3} 
 				onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
 				<button className="QuestionPostingForm_confirm" onClick={()=>this.submit()}>Submit Question!</button>
+
+				{this.state.screenBlocked? <ScreenBlocker/>: null}
+				<PopupAlert ref="popupAlert"/>
 			</div>
 		);
 	}
