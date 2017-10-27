@@ -13,44 +13,70 @@ Props:
 	onUnChoosingATimeSlot - processing click again to cancel. System calling time slot form should be responsible for logic
 	availableTimeSlots - time instant in number that is available
 	onlyOneChoice - is the form only allows one choice
-	days -how many days to show (But actually we show days+1)
+	currentInstant - current's instant
 	
 */
 class TimeSlotForm extends Component {
+
+
+	constructor(props){
+		super(props);
+
+		this.state={
+			days: null,
+		}
+	}
+
+	componentWillMount(){
+		var daysTemp = []
+		for (var i = 0; i <= 3; i++){
+			var SlotChosenArr = [];
+			for (var j = 0; j < 24; j++) {
+				SlotChosenArr.push(false);
+			}
+			daysTemp.push(SlotChosenArr);
+		}
+		this.setState({
+			days: daysTemp,
+		});
+	}
 
 	/*
 	function to run when a time slot is chosen
 	According to if this time slot form is "one choice only", it may clean the previous chosen time slot
 
 	Params:
-		dateTime - the date and time being chosen
+		day - which day does the slog belong
+		slot - hr of the slot
+		dateTime - the date and time being unchosen
 
 	Question:
 		Q: Why we don't use state to record which slot was chosen before and when we choose another slot we only update the old slot?
 		A: Because setting state will cause react js to render again. We just want each small slot instead of the whole picture to re-render. Of course you can 
 		   avoid this by overriding shouldComponentUpdate, but we just want to make it more refreshable... Alright I'm lazy! Damn!
 	*/
-	onChoosingATimeSlot(dateTime) {
+	onChoosingATimeSlot(day, slot, dateTime) {
 		if (this.props.onChoosingATimeSlot(dateTime)) {
+			var daysTemp;
 			if (this.props.onlyOneChoice) {
-				for(var i = 0;i <= this.props.days; i++) {
-					this.refs["day"+i].cleanChosen();
+				daysTemp = this.state.days;
+				for (var i = 0; i <= 3; i++){
+					for (var j = 0; j < 24; j++) {
+						if (i === day && j === slot){
+							daysTemp[i][j] = true;
+						}else if(daysTemp[i][j]){
+							daysTemp[i][j] = false;
+						}	
+					}
 				}
+				
+			} else {
+				daysTemp = this.state.days;
+				daysTemp[day][slot] = true;
 			}
-			return true;
-		}
-		return false;
-	}
-
-	/*
-	clear all slots
-	Called by parent
-	We make it a parent call functions because it is not always needed. 
-	Sometimes we will just leave the time slot form and remove it from virtual DOM from parent
-	*/
-	clear() {
-		for(var i = 0;i <= this.props.days; i++) {
-			this.refs["day"+i].cleanChosen();
+			this.setState({
+				days: daysTemp,
+			});
 		}
 	}
 
@@ -58,28 +84,70 @@ class TimeSlotForm extends Component {
 	function to run when a time slot is unchosen
 
 	Params:
+		day - which day does the slog belong
+		slot - hr of the slot
 		dateTime - the date and time being unchosen
 	*/
-	onUnChoosingATimeSlot(dateTime) {
+	onUnChoosingATimeSlot(day, slot, dateTime) {
 		if (this.props.onUnChoosingATimeSlot(dateTime)) {
-			return true;
+			var daysTemp = this.state.days;
+			daysTemp[day][slot] = false;
+			this.setState({
+				days: daysTemp,
+			});
 		}
-		return false;
+	}
+
+	componentWillReceiveProps(newProps){
+		if (newProps.currentInstant !== this.props.currentInstant) {
+			var daysTemp = []
+			for (var i = 0; i <= 3; i++){
+				var SlotChosenArr = [];
+				for (var j = 0; j < 24; j++) {
+					SlotChosenArr.push(false);
+				}
+				daysTemp.push(SlotChosenArr);
+			}
+			this.setState({
+				days: daysTemp,
+			});
+		}
 	}
 
 	/*
 	render all the days needed
+	we put them together because we only want to show one "current"
 	*/
 	renderDays(){
-		var daysToRender = []
-		var today = new Date();
-		for (var i = 0; i <= this.props.days; i++) {
-			daysToRender.push (
-			<Day ref={"day"+i} key={i} date={today.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} 
-			onChoosingATimeSlot={(dateTime) => this.onChoosingATimeSlot(dateTime)}  onUnChoosingATimeSlot={(dateTime) => this.onUnChoosingATimeSlot(dateTime)} isLastDay={i===this.props.days?true:false}
-			/>);
-			today.setDate(today.getDate() + 1);
-		}
+		var daysToRender = [];
+		var current = new Date(this.props.currentInstant);
+		//day 1
+		daysToRender.push (
+		<Day key={0} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.state.days[0]}
+		onChoosingATimeSlot={(slot, dateTime) => this.onChoosingATimeSlot(0, slot, dateTime)} 
+		 onUnChoosingATimeSlot={(slot, dateTime) => this.onUnChoosingATimeSlot(0, slot, dateTime)} isLastDay={false}
+		/>);
+		current.setDate(current.getDate() + 1);
+		//day 2
+		daysToRender.push (
+		<Day key={1} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.state.days[1]}
+		onChoosingATimeSlot={(slot, dateTime) => this.onChoosingATimeSlot(1, slot, dateTime)} 
+		 onUnChoosingATimeSlot={(slot, dateTime) => this.onUnChoosingATimeSlot(1, slot, dateTime)} isLastDay={false}
+		/>);
+		current.setDate(current.getDate() + 1);
+		//day 3
+		daysToRender.push (
+		<Day key={2} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.state.days[2]}
+		onChoosingATimeSlot={(slot, dateTime) => this.onChoosingATimeSlot(2, slot, dateTime)} 
+		 onUnChoosingATimeSlot={(slot, dateTime) => this.onUnChoosingATimeSlot(2, slot, dateTime)} isLastDay={false}
+		/>);
+		current.setDate(current.getDate() + 1);
+		//day 4
+		daysToRender.push (
+		<Day key={3} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.state.days[3]}
+		onChoosingATimeSlot={(slot, dateTime) => this.onChoosingATimeSlot(3, slot, dateTime)} 
+		 onUnChoosingATimeSlot={(slot, dateTime) => this.onUnChoosingATimeSlot(3, slot, dateTime)} isLastDay={true}
+		/>);
 
 		return daysToRender;
 

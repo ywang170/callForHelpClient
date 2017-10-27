@@ -6,6 +6,7 @@ import './Day.css';
 Description: show 24 time slot
 Props: 	
 	date - date of this day, in the format of a date string like "April 16, 2017" or "04/15/1994", it is LOCAL TIME!
+	slots - an array showing if each time is taken
 	availableTimeSlots - set of time slots that are available, in time instant, which is a number
 	onChoosingATimeSlot - will be passed into each time slot as the onClick function
 	onUnChoosingATimeSlot - on choose the chosen time slot again
@@ -27,19 +28,6 @@ class Day extends Component {
 			anyTimeAvailableOnThisDay: true,
 		}
 
-	}
-
-	/*
-	a function called by parents using reference to clean all chosen slots
-	*/
-	cleanChosen(){
-		for(var i = 0;i < 24; i++) {
-			var refTag = "timeSlot"+i;
-			if(this.refs[refTag]){
-				this.refs[refTag].unChooseWithoutSendingSignal();
-			}
-			
-		}
 	}
 
 	/*
@@ -68,7 +56,8 @@ class Day extends Component {
 		//check if this time instant is available, plus it has to be bigger than now
 		if (this.props.availableTimeSlots.has(timeInstant) && timeInstant > new Date().getTime()) {
 			return (
-				<TimeSlot ref={"timeSlot"+hourOfTheDay} time={timeToShow} date={this.props.date} available={true} onChoose={this.props.onChoosingATimeSlot} onUnChoose={this.props.onUnChoosingATimeSlot}
+				<TimeSlot ref={"timeSlot"+hourOfTheDay} time={timeToShow} date={this.props.date} available={true} onChoose={(datetime) => this.props.onChoosingATimeSlot(hourOfTheDay, datetime)} 
+				onUnChoose={(datetime) =>this.props.onUnChoosingATimeSlot(hourOfTheDay, datetime)} chosen={this.props.slots[hourOfTheDay]}
 				/>
 			);
 		} else {

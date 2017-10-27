@@ -40,6 +40,7 @@ class QuestionPostingForm extends Component {
 			chosenTimeSlots: new Set(),
 			refresh: false,
 			screenBlocked: false,
+			currentInstant: '',
 		}
 	}
 
@@ -104,11 +105,11 @@ class QuestionPostingForm extends Component {
 				availableTimeSlots: availableTimeSlotsTemp,
 				chosenTimeSlots: new Set(),
 				screenBlocked: shouldUnblockScreen? false: this.state.screenBlocked,
+				currentInstant: new Date().getTime(),
 				refresh: !this.state.refresh,
-			})
+			});
 			this.refs["title"].clear();
 			this.refs["content"].clear();
-			this.refs["timeSlotForm"].clear();
 		}.bind(this))
 		.catch(function(err){
 			//on error. We don't populate here because it would be horrible if we keep populating
@@ -270,7 +271,7 @@ class QuestionPostingForm extends Component {
 			<div className="QuestionPostingForm_questionPostingFormContainer">
 				<span>Title: </span><InputComponent ref={"title"} cssClass={"QuestionPostingForm_questionTitle"}/>
 				<TextareaComponent ref={"content"} cssClass={"QuestionPostingForm_questionContent"}/>
-				<TimeSlotForm  ref="timeSlotForm" availableTimeSlots={this.state.availableTimeSlots} onlyOneChoice={false} days={3} 
+				<TimeSlotForm  currentInstant={this.state.currentInstant} availableTimeSlots={this.state.availableTimeSlots} onlyOneChoice={false} days={3} 
 				onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
 				<button className="QuestionPostingForm_confirm" onClick={()=>this.submit()}>Submit Question!</button>
 
