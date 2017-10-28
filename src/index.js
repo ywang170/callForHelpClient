@@ -11,14 +11,15 @@ import questionTest2 from './test/questionTest';
 import ScreenBlockerTest from './test/ScreenBlockerTest'
 import AskQuestionTest from './test/askQuestionTest';
 import Header from './header/Header';
+import Questions from './questions/Questions';
 
 
 ReactDOM.render(
 		<BrowserRouter>
 			<div>
 				<Route path="/" component={Header} />
-				<Route path="/signInSignUp" component={SignInSignUp} />
-				<Route path="/questions" component={questions} />
+				<Route path="/signInSignUp/:register?" component={SignInSignUp} />
+				<Route path="/questions" component={Questions} />
 				<Route path="/cookieTest" component={cookieTest} />
 				<Route path="/timeSlotFormTest" component={timeSlotFormTest} />
 				<Route path='/screenBlockerTest' component={ScreenBlockerTest}/>

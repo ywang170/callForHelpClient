@@ -1,61 +1,80 @@
 .signInSignUpContainer{
-	width: 1000px;
-	margin-left: auto;
-	margin-right: auto;
+	width: 600px;
+	position: absolute;
+	left: 50%;
+	top: 220px;
+	margin-left: -300px;
+	
 }
 
 .signInSignUpSubContainer{
 	width: 100%;
 	padding-top: 30px;
 	float:left;
-	min-height: 600px;
+	border: solid lightgray 5px;
+	margin-bottom: 50px;
+
 }
 
 .title{
-	font-size: 24pt;
+	font-size: 18pt;
 	text-align: center;
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom: 30px;
+	margin-bottom: 20px;
 	width: 100%;
 }
 
 .toggleButton {
-	background-color: green;
+	color: green;
 	border: none;
-	color: white;
 	text-align: center;
 	display: inline-block;
 	float: right;
-	margin-right: 200px;
+	margin-right: 100px;
+	font-size: 12pt;
 	cursor: pointer;
+	text-decoration: underline;
+}
+
+.toggleButton:hover{
+	color:lightgreen;
 }
 
 .signInDiv, .signUpDiv{
 	float:left;
-	width: 950px;
+	width: 480px;
+	margin-left: 50px;
 	padding: 10px;
-	margin: 5px;
 	margin-top: 30px;
+	margin-bottom: 30px;
 }
 
 .fieldSpan{
-	font-size: 12pt;
-	color: lightblue;
+	font-size: 10pt;
+	color: steelblue;
+	margin-left: 80px;
 }
 
-.warningSpan{
-	font-size: 10pt;
-	color:red;
-}
 
 .confirmButton{
-	margin-top: 20px;
-	margin-bottom: 10px;
-	margin-left: 100px;
 	width: 100px;
+	height: 40px;
+	margin-left: 190px;
+	margin-top: 30px;
+	background-color: gray;
+	border:none;
 	float:left;
 	cursor: pointer;
+	font-size: 14pt;
+	color:white;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+
+}
+
+.confirmButton:hover{
+	background-color: lightgray;
 
 }
 
@@ -73,6 +92,6 @@ li{
 
 input{
 	width: 300px;
-	font-size: 20pt;
-	margin-right: 20px;
+	font-size: 16pt;
+	margin-left: 80px;
 }

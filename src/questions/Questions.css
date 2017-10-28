@@ -5,6 +5,33 @@
 	padding: 10px;
 }
 
+.AskingQuestionTriggerButton{
+	position: fixed;
+	top:250px;
+	left:50%;
+	width: 180px;
+	height: 100px;
+	margin-left:-480px;
+	z-index: 5;
+	background-image:url("../image/ask_question.png");
+	background-size: contain;
+	background-repeat: no-repeat;
+	cursor: pointer;
+	-webkit-transition-duration: 0.3s;
+	transition-duration: 0.3s;
+	text-align: center;
+	line-height: 100px;
+	font-size: 14pt;
+	color:rgba(0,0,0,0);
+	opacity: 0.75;
+}
+
+.AskingQuestionTriggerButton:hover{
+	color:white;
+	text-shadow: 0px 0px 4px black;
+	opacity: 1;
+}
+
 .LoadOlderQuestionsButton{
 	display: inline-block;
 	vertical-align: middle;

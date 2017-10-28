@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import QuestionWithAnswerButton from './QuestionWithAnswerButton';
 import TimeSlotFormForAnswerQuestion from './TimeSlotFormForAnswerQuestion';
 import PopupAlert from '../utility/popupAlert/PopupAlert';
+import QuestionPostingForm from '../utility/questionPostingForm/QuestionPostingForm';
 import {withRouter} from 'react-router';
 import './Questions.css';
 
@@ -34,14 +35,42 @@ class Questions extends Component {
 			showTimeSlotForm: false,
 			timeSlotFormQuestionId: '',
 			timeSlotFormAvailableTimeSlot: '',
+			//ask question info
+			showQuestionPostingForm: false,
+			//loading blocker
+			blockLoadingQuestions: false,
 			//user info
 			username: '',
 		}
 	}
 
-	componentDidMount(){
+	//////////////////////////////////////////////////////questions Loading//////////////////////////////////////////////////////////////////
+
+	loadQuestions(loadNewer, loadOlder, amount){
+		if (this.state.blockLoadingQuestions) {
+			console.log("was trying to load more questions but action was blocked");
+			return;
+		}
+		this.blockLoadingQuestions();
+		var serverUrl = '/getQuestions';
+
+		if (loadNewer && this.state.latestQuestionId && this.state.latestQuestionId !== 0) {
+			serverUrl += ('/' + this.state.latestQuestionId + '/0');
+
+		} else if (loadOlder && this.state.oldestQuestionId && this.state.oldestQuestionId !== 0) {
+			serverUrl += ('/0/' + this.state.oldatesQuestionId);
+		} else {
+			serverUrl += '/0/0'
+		}
+
+		if (amount && !isNaN(amount) && amount > 0 && amount < 100) {
+			serverUrl += ('/' + amount);
+		}
+
+		console.log(serverUrl);
+
 		//load questions from server and get latest and oldest id
-		fetch('/getQuestions', {
+		fetch(serverUrl, {
 			method: "GET",
 			mode: 'cors',
 			credentials: 'same-origin',
@@ -51,11 +80,12 @@ class Questions extends Component {
 			if (!res.ok) {
 				switch (res.status) {
 					case 401:
-						this.props.history.push('/signInSignUp');
+						this.onValidationFail();
 						break;
 					default:  //other error, usually 500
 						break;
 				}
+				console.log(res.json());
 				throw new Error('get questions fail');
 			}
 			return res.json();
@@ -64,8 +94,19 @@ class Questions extends Component {
 		.then(function(data){
 			var username = data.username;
 			var questionListTemp = [];
-			var oldestQuestionIdTemp = 0;
-			var latestQuestionIdTemp = 0;
+			var oldestQuestionIdTemp = this.state.oldestQuestionId;
+			var latestQuestionIdTemp = this.state.latestQuestionId;
+			//update newer and older
+			if(data.questions.length !== 0){
+				if (loadNewer){
+					latestQuestionIdTemp = data.questions[data.questions.length-1].questionid;
+				} else if(loadOlder) {
+					oldestQuestionIdTemp = data.questions[0].questionid;
+				} else {
+					oldestQuestionIdTemp = data.questions[0].questionid;
+					latestQuestionIdTemp = data.questions[data.questions.length-1].questionid;
+				}	
+			}
 			//question will always be in the order from oldest to newest
 			for (var i = 0; i < data.questions.length; i++) {
 				var question = data.questions[i];
@@ -74,10 +115,14 @@ class Questions extends Component {
 				}
 				questionListTemp.unshift(question);
 			}
-			if(data.questions.length !== 0){
-				oldestQuestionIdTemp = data.questions[0].questionid;
-				latestQuestionIdTemp = data.questions[data.questions.length-1].questionid;
+			//update lower/newer accordingly
+			if (loadNewer) {
+				questionListTemp = questionListTemp.concat(this.state.questionList);
+
+			} else if(loadOlder) {
+				questionListTemp = this.state.questionList.concat(questionListTemp);
 			}
+			//otherwise questionListTemp itself is what we want
 			//populate state
 			this.setState({
 				questionList: questionListTemp,
@@ -85,13 +130,15 @@ class Questions extends Component {
 				oldestQuestionId: oldestQuestionIdTemp,
 				latestQuestionId: latestQuestionIdTemp,
 			});
-			//keep loading questions every a while
-			setTimeout(this.loadLaterQuestions.bind(this), 60000);
+			this.unblockLoadingQuestions();
+			console.log("new oldest question Id " + this.state.oldestQuestionId);
+			console.log("new latest question Id " + this.state.latestQuestionId);
 			
 		}.bind(this))
 		.catch(function(err){
+			this.unblockLoadingQuestions();
 			console.log('get questions fail');
-		});
+		}.bind(this));
 	}
 
 	/*
@@ -106,10 +153,53 @@ class Questions extends Component {
 	*/
 	loadLaterQuestions(){
 		console.log("loading more recent questions");
-		setTimeout(this.loadLaterQuestions.bind(this), 60000);
+		this.loadQuestions(true, false);
+		setTimeout(this.loadLaterQuestions.bind(this), 30000);
 	}
 
+
+	/////////////////////////////////////////////////////asking a question///////////////////////////////////////////////////////////////////
+	onShowQuestionPostingForm(){
+		this.setState({
+			showQuestionPostingForm: true,
+		})
+	}
+
+	onCancelCreateQuestion(){
+		this.setState({
+			showQuestionPostingForm: false,
+		})
+	}
+
+	onSubmitQuestion(){
+		this.setState({
+			showQuestionPostingForm: false,
+		})
+	}
+
+	onUserBusySubmittingQuestion(){
+		this.refs["popupAlert"].showMessage("same user is submitting a question elsewhere, please try again later!");
+	}
+
+	onSubmitQuestionServerError(){
+		this.refs["popupAlert"].showMessage("your submitted question failed to be created for server error");
+	}
+
+
+
+
+	///////////////////////////////////////////////////////populating a question's time slot////////////////////////////////////////////////
+
+	/*
+	When user click on a question's "yes" button, we provide him with time slots
+	*/
 	onAnswerQuestion(questionId, slots, askerUsername){
+		//block updating
+		if (this.state.blockLoadingQuestions) {
+			return;
+		} else {
+			this.blockLoadingQuestions();
+		}
 		//current available slots
 		var availableTimeSlots = new Set();
 		var currentTimeInstant = new Date().getTime();
@@ -132,7 +222,7 @@ class Questions extends Component {
 			if (!res.ok) {
 				switch (res.status) {
 					case 401:
-						this.props.history.push('/signInSignUp');
+						this.onValidationFail();
 						break;
 					default:  //other error, usually 500
 						break;
@@ -152,6 +242,7 @@ class Questions extends Component {
 			//if no slot available for this question just delete it
 			if (availableTimeSlots.size === 0){
 				this.deleteQuestionById(questionId);
+				this.unblockLoadingQuestions();
 				this.refs["popupAlert"].showMessage("sorry the question has no compatible time with your schedule!", 5000);
 				return;
 			} 
@@ -163,27 +254,16 @@ class Questions extends Component {
 			});
 		}.bind(this))
 		.catch(function(err){
-			
-		});
+			//unblock loading
+			this.unblockLoadingQuestions();
+		}.bind(this));
 	}
 
-	deleteQuestionById(questionId){
-		var questionListTemp = this.state.questionList;
-		var index = -1;
-		for (var i = 0; i < questionListTemp.length; i ++) {
-			if (questionListTemp[i].questionid === questionId) {
-				index = i;
-				break;
-			}
-		}
-		if(index >= 0) {
-			questionListTemp.splice(index, 1);
-			this.setState({
-				questionList: questionListTemp,
-			});
-		}
-	}
+	/////////////////////////////////////////////////////confirm time//////////////////////////////////////////////////////////
 
+	/*
+	when user picked a time slot and confirm
+	*/
 	onTimeSlotFormConfirmTime(dateTime, questionId, comment) {
 		//hide popup
 		this.setState({
@@ -207,7 +287,7 @@ class Questions extends Component {
 				console.log(res.json());
 				switch (res.status) {
 					case 401: //validation fail
-						this.props.history.push('/signInSignUp');					
+						this.onValidationFail();	
 						break;
 					default:  //other error, usually 500
 						//give user a popup alert	
@@ -218,26 +298,75 @@ class Questions extends Component {
 			//no need to notify user
 			//but we are going to remove a question from list. Here we do a binary search
 			this.deleteQuestionById(questionId);
-			return res.json();
+			this.unblockLoadingQuestions();
 			
 		}.bind(this))
-		.then(function(data){
-
-		})
 		.catch(function(err){
+			console.log("confirming date fail!");
+			this.unblockLoadingQuestions();
 			//some handle for error
-		});
+		}.bind(this));
 	}
 
+	/*
+	helper function to delete question using its ID
+	*/
+	deleteQuestionById(questionId){
+		var questionListTemp = this.state.questionList;
+		var index = -1;
+		for (var i = 0; i < questionListTemp.length; i ++) {
+			if (questionListTemp[i].questionid === questionId) {
+				index = i;
+				break;
+			}
+		}
+		if(index >= 0) {
+			questionListTemp.splice(index, 1);
+			this.setState({
+				questionList: questionListTemp,
+			});
+		}
+	}
+
+	/*
+	when user clicked on the white region to cancel time slot confirmation
+	*/
 	onCancelAnswerQuestion(){
 		this.setState({
 			showTimeSlotForm: false,
 		});
+		this.unblockLoadingQuestions();
 	}
 
-	shouldComponentUpdate(nextProps, nextState){
-		return true;
+
+	/////////////////////////////////////////////other functions////////////////////////////////////////////////////
+
+	onValidationFail(){
+		this.props.history.push('/signInSignUp');			
 	}
+
+	blockLoadingQuestions(){
+		console.log("blocking loading questions");
+		this.setState({
+			blockLoadingQuestions: true,
+		});
+	}
+
+	unblockLoadingQuestions(){
+		console.log("unblocking loading questions");
+		this.setState({
+			blockLoadingQuestions: false,
+		});
+	}
+
+	/////////////////////////////////////////////render view////////////////////////////////////////////////////////
+	componentDidMount(){
+		this.loadQuestions(false,false,30);
+		//keep loading questions every a while
+		setTimeout(this.loadLaterQuestions.bind(this), 30000);
+		
+	}
+
 
 	renderQuestions(){
 		var questionsToRender = [];
@@ -255,11 +384,18 @@ class Questions extends Component {
 	render() {
 		return (
 			<div className="QuestionsContainer">
+				<div className="AskingQuestionTriggerButton" onClick={()=>this.onShowQuestionPostingForm()}>Ask a Question</div>
+				<QuestionPostingForm asPopup={true} show={this.state.showQuestionPostingForm} onCancelCreateQuestion={()=>this.onCancelCreateQuestion()} 
+				onSubmit={()=>this.onSubmitQuestion()} onUserBusy={()=>this.onUserBusySubmittingQuestion()} onServerError={()=>this.onSubmitQuestionServerError()}
+				onValidationFail={()=>this.onValidationFail()}/>
+
 				{this.renderQuestions()}
+
 				<TimeSlotFormForAnswerQuestion show={this.state.showTimeSlotForm} availableTimeSlots={this.state.timeSlotFormAvailableTimeSlot} 
 				onConfirmTime={(dateTime, comment) => this.onTimeSlotFormConfirmTime(dateTime, this.state.timeSlotFormQuestionId, comment)}
 				onCancelAnswerQuestion = {()=>this.onCancelAnswerQuestion()}/>
 				<div className="LoadOlderQuestionsButton" onClick={() => this.loadOlderQuestions()}>Load me more questions</div>
+
 				<PopupAlert ref="popupAlert"/>
 			</div>
 		);

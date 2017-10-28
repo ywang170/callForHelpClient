@@ -6,8 +6,15 @@
 	padding-top: 20px;
 	border-radius: 25px;
 	background-color: skyblue;
+	top:20px;
 	left:50%;
-	margin-left: -230px
+	margin-left: -230px;
+	animation: slidein 0.5s;
+}
+
+@keyframes slidein{
+	0% {opacity: 0;}
+	100%{opacity: 1;}
 }
 
 .TimeSlotFormForAnswerQuestionComment{

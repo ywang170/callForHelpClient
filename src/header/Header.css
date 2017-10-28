@@ -5,14 +5,36 @@
 	position: relative;
 	border-bottom: 1px solid gray;
 	overflow: hidden;
+	background-repeat: repeat-x;
+	background-size: contain;
+	background-image: url("../image/header_background_small.png");
 }
 
-.Header_img{
-	width: 100%;
-	float:left;
+.Header_links{
+	position: absolute;
+	font-size: 10pt;
+	top:5px;
+	right: 5px;
+	z-index: 5;
+}
+
+.Header_link{
+	float: left;
+	padding-left: 5px;
+	padding-right: 5px;
+	text-decoration: underline;
+	cursor: pointer;
+	-webkit-transition-duration: 0.2s;
+	transition-duration: 0.2s;
+}
+
+.Header_link:hover{
+	background-color: gray;
+	color: white;
 }
 
 .Header_title{
+	z-index: 1;
 	width: 600px;
 	position: absolute;
 	left: 50%;

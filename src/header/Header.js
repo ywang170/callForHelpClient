@@ -1,15 +1,23 @@
 import React, { Component } from 'react';
 import {withRouter} from 'react-router';
-import bkgd from "../image/background1.jpg";
 import './Header.css';
 
 class Header extends Component{
 
+	toUrl(url){
+		this.props.history.push(url);
+	}
 
 	render(){
 		return (
 			<div className="Header_banner">
-				<img className="Header_img" src={bkgd} alt="image can not load...:\"/>
+				<div className="Header_links">
+					<a className="Header_link" onClick={()=>this.toUrl('/questions')}>Home</a>
+					<a className="Header_link">My Note</a>
+					<a className="Header_link">Setting</a>
+					<a className="Header_link" onClick={()=>this.toUrl('/signInSignUp')}>Login/Register</a>
+					<a className="Header_link">Credit</a>
+				</div>
 				<div className="Header_title"></div>
 				
 			</div>

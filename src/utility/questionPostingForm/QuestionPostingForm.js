@@ -49,7 +49,10 @@ class QuestionPostingForm extends Component {
 	}
 
 	componentDidMount(){
-		this.populating();
+		if (!this.props.asPopup){
+			this.populating();
+		}
+		
 	}
 
 	componentWillReceiveProps(newProps){
@@ -83,6 +86,9 @@ class QuestionPostingForm extends Component {
 			//handle errors
 			if (!res.ok) {
 				switch (res.status) {
+					case 304:
+						console.log("304, nothing changes for user slot!");
+						break;
 					case 401:
 						if(this.props.onValidationFail){
 							this.props.onValidationFail(res.json());
@@ -100,6 +106,7 @@ class QuestionPostingForm extends Component {
 			
 		}.bind(this))
 		.then(function(data){
+			console.log("getting user slot successful");
 			//get unavailable time slots out of available time
 			for (var i = 0; i < data.slots.length; i++) {
 				var takenSlotInstant = new Date(data.slots[i].time).getTime();
@@ -214,7 +221,7 @@ class QuestionPostingForm extends Component {
 			
 		}.bind(this))
 		.then(function(data){
-			console.log("question successfully submitted! now refreshing!");
+			console.log("question successfully submitted!");
 			if (this.props.onSuccessful) {
 				this.props.onSuccessful(data);
 			} 
@@ -286,7 +293,7 @@ class QuestionPostingForm extends Component {
 	render(){
 		return (
 			<div>
-			{this.props.asPopup? <ScreenBlocker onClick={this.props.onCancelCreateQuestion} />: null}
+			{this.props.asPopup&& this.props.show? <ScreenBlocker onClick={this.props.onCancelCreateQuestion} />: null}
 			{this.props.asPopup && !this.props.show? null:
 				<div className={this.props.asPopup?"QuestionPostingForm_questionPostingFormContainerPopup":"QuestionPostingForm_questionPostingFormContainer"}>
 					<span>Title: </span><InputComponent ref={"title"} cssClass={"QuestionPostingForm_questionTitle"}/>
