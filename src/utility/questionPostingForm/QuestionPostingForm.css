@@ -8,6 +8,27 @@
 	position: relative;
 }
 
+.QuestionPostingForm_questionPostingFormContainerPopup{
+	position: fixed;
+	z-index: 11;
+	width:950px;
+	padding-left: 10px;
+	height: 630px;
+	background-color: rgb(249,231,159);
+	border-radius: 15px;
+	left:50%;
+	margin-left: -480px;
+	top:30px;
+	animation: fallin 0.5s;
+}
+
+@keyframes fallin{
+	0% {top:-650px;}
+	50% {top: 50px;}
+	75% {top:0px;}
+	100%{top:30px;}
+}
+
 .QuestionPostingForm_questionPostingFormContainer span{
 	margin-left: 20px;
 	font-size: 12pt;

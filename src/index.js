@@ -10,11 +10,13 @@ import timeSlotFormTest from './test/timeSlotFormTest';
 import questionTest2 from './test/questionTest';
 import ScreenBlockerTest from './test/ScreenBlockerTest'
 import AskQuestionTest from './test/askQuestionTest';
+import Header from './header/Header';
 
 
 ReactDOM.render(
 		<BrowserRouter>
 			<div>
+				<Route path="/" component={Header} />
 				<Route path="/signInSignUp" component={SignInSignUp} />
 				<Route path="/questions" component={questions} />
 				<Route path="/cookieTest" component={cookieTest} />

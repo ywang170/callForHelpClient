@@ -23,6 +23,9 @@ props:
 	onSubmit - when submit. This module will auto send submittion to db. But in care parent component may want to do somethings like hide module, etc...
 	onSuccessful - when submission succeed
 	shouldShowMessage - if this is true then show message. Otherwise parent should be responsible for showing messages
+	asPopup - rendered as a popup
+	show - only used when as a popup
+	onCancelCreateQuestion - only used as popup, when cancel creating a question
 
 state:
 	availableTimeSlots - available time slots for new question,
@@ -45,17 +48,20 @@ class QuestionPostingForm extends Component {
 		}
 	}
 
-	componentWillMount(){
+	componentDidMount(){
 		this.populating();
+	}
+
+	componentWillReceiveProps(newProps){
+		if (newProps.show === true) {
+			this.populating();
+		}
 	}
 
 	/*
 	function used to get user time slots and update the state: availableTimeSlots
-
-	Params:
-		shouldUnblockScreen - should unblock the screen?
 	*/
-	populating(shouldUnblockScreen){
+	populating(){
 		//generate available time slots for next 72 hrs
 		var availableTimeSlotsTemp = new Set();
 		var currDateTime = new Date();
@@ -79,12 +85,12 @@ class QuestionPostingForm extends Component {
 				switch (res.status) {
 					case 401:
 						if(this.props.onValidationFail){
-							this.props.onValidationFail();
+							this.props.onValidationFail(res.json());
 						}						
 						break;
 					default:  //other error, usually 500
 						if (this.props.onServerError) {
-							this.props.onServerError();
+							this.props.onServerError(res.json());
 						}						
 						break;
 				}
@@ -105,7 +111,7 @@ class QuestionPostingForm extends Component {
 			this.setState({
 				availableTimeSlots: availableTimeSlotsTemp,
 				chosenTimeSlots: new Set(),
-				screenBlocked: shouldUnblockScreen? false: this.state.screenBlocked,
+				screenBlocked: false,
 				currentInstant: new Date().getTime(),
 				refresh: !this.state.refresh,
 			});
@@ -150,17 +156,20 @@ class QuestionPostingForm extends Component {
 		//client validation
 		if (!questionTitle || typeof questionTitle !== 'string' || questionTitle.length < 15 || questionTitle.length > 200) {
 			console.log('question title in wrong form');
+			this.refs["popupAlert"].showMessage("question title must be between 15 to 200 characters");		
 			return;
 		}		
 		if (!questionContent || typeof questionContent !== 'string' || questionContent.length > 3000) {
 			console.log('question content in wrong form');
+			this.refs["popupAlert"].showMessage("question content can't be empty or over 3000 characters");		
 			return;
 		}
 		if (!questionSlots || !Array.isArray(questionSlots) || questionSlots.length < 1 || questionSlots.length > 72) {
+			this.refs["popupAlert"].showMessage("please pick at least one time slot");
 			console.log('chosen slots in wrong form');
 			return;
 		}
-		//block screen
+		//block screen to prevent further user interaction
 		this.blockScreen();
 		//send submittion to database
 		fetch('/setQuestions/create', {
@@ -179,12 +188,12 @@ class QuestionPostingForm extends Component {
 				switch (res.status) {
 					case 401: //validation fail
 						if (this.props.onValidationFail){
-							this.props.onValidationFail();
+							this.props.onValidationFail(res.json());
 						}						
 						break;
 					case 423://user is currently asking in another environment
 						if (this.props.onUserBusy) {
-							this.props.onUserBusy();
+							this.props.onUserBusy(res.json());
 						} 
 						if (this.props.shouldShowMessage) {
 							this.refs["popupAlert"].showMessage("the same user is submitting a question now in another environment...\nPlease try again later!", 3000);		
@@ -192,7 +201,7 @@ class QuestionPostingForm extends Component {
 						break;
 					default:  //other error, usually 500
 						if (this.props.onServerError) {
-							this.props.onServerError();
+							this.props.onServerError(res.json());
 						} 
 						if (this.props.shouldShowMessage) {
 							this.refs["popupAlert"].showMessage("question submission failed for server error!", 3000);					
@@ -207,17 +216,21 @@ class QuestionPostingForm extends Component {
 		.then(function(data){
 			console.log("question successfully submitted! now refreshing!");
 			if (this.props.onSuccessful) {
-				this.props.onSuccessful();
+				this.props.onSuccessful(data);
 			} 
 			if (this.props.shouldShowMessage) {
 				this.refs["popupAlert"].showMessage("your question is submitted!", 3000);
 			}
-			this.populating(true);
+			if (!this.props.asPopup) { //if it is a popup then we don't need to reset anything at all
+				this.populating();
+			}
 		}.bind(this))
 		.catch(function(err){
 			console.log('submit question fail');
 			//no matter if user is busy, server error or validation fail, we should not refresh but should lower the shield
-			this.unblockScreen();
+			if (!this.props.asPopup) {
+				this.unblockScreen();
+			}
 		});
 		if (this.props.onSubmit) {
 			this.props.onSubmit();
@@ -264,7 +277,7 @@ class QuestionPostingForm extends Component {
 	only refreshes when populating everything
 	*/
 	shouldComponentUpdate(nextProps, nextState){
-		if (this.state.refresh !== nextState.refresh) {
+		if (this.state.refresh !== nextState.refresh || (this.props.asPopup && this.props.show !== nextProps.show)) {
 			return true;
 		}
 		return false;
@@ -272,15 +285,20 @@ class QuestionPostingForm extends Component {
 
 	render(){
 		return (
-			<div className="QuestionPostingForm_questionPostingFormContainer">
-				<span>Title: </span><InputComponent ref={"title"} cssClass={"QuestionPostingForm_questionTitle"}/>
-				<TextareaComponent ref={"content"} cssClass={"QuestionPostingForm_questionContent"}/>
-				<TimeSlotForm  currentInstant={this.state.currentInstant} availableTimeSlots={this.state.availableTimeSlots} onlyOneChoice={false} days={3} 
-				onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
-				<button className="QuestionPostingForm_confirm" onClick={()=>this.submit()}>Submit Question!</button>
+			<div>
+			{this.props.asPopup? <ScreenBlocker onClick={this.props.onCancelCreateQuestion} />: null}
+			{this.props.asPopup && !this.props.show? null:
+				<div className={this.props.asPopup?"QuestionPostingForm_questionPostingFormContainerPopup":"QuestionPostingForm_questionPostingFormContainer"}>
+					<span>Title: </span><InputComponent ref={"title"} cssClass={"QuestionPostingForm_questionTitle"}/>
+					<TextareaComponent ref={"content"} cssClass={"QuestionPostingForm_questionContent"}/>
+					<TimeSlotForm  currentInstant={this.state.currentInstant} availableTimeSlots={this.state.availableTimeSlots} onlyOneChoice={false} days={3} 
+					onChoosingATimeSlot={(timeSlot) => this.onChoosingATimeSlot(timeSlot)} onUnChoosingATimeSlot={(timeSlot)=>this.onUnChoosingATimeSlot(timeSlot)}/>
+					<button className="QuestionPostingForm_confirm" onClick={()=>this.submit()}>Submit Question!</button>
 
-				{this.state.screenBlocked? <ScreenBlocker blockParentOnly={true}/>: null}
-				<PopupAlert ref="popupAlert"/>
+					{this.state.screenBlocked? <ScreenBlocker blockParentOnly={true}/>: null}
+					<PopupAlert ref="popupAlert"/>
+				</div>
+			}
 			</div>
 		);
 	}

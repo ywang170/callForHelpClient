@@ -11,24 +11,45 @@ class PopupAlert extends Component{
 		super(props);
 
 		this.state={
-			message:''
+			message:'',
+			messageList:[]
 		}
 	}
 
 	showMessage(msg, timeoutTime){
+		if (this.state.message !== '') {
+			var messageListTemp = this.state.messageList;
+			messageListTemp.push(msg);
+			this.setState({
+				messageList: messageListTemp,
+			});
+			return;
+		} else {
+			this.revealMessage(msg);
+		}
+	}
+
+	revealMessage(msg){
 		this.setState({
 			message:msg
 		});
-		if (!timeoutTime) {
-			timeoutTime = 3000;
-		}
-		setTimeout(this.removeAlert.bind(this), timeoutTime);
+		setTimeout(this.removeAlert.bind(this), 5000);
 	}
 
 	removeAlert(){
+		var messageListTemp = this.state.messageList;
+		var nextMsg;
+		if (messageListTemp.length !== 0){
+			nextMsg = messageListTemp.shift();
+		}
 		this.setState({
 			message:'',
+			messageList: messageListTemp,
 		});
+		if (nextMsg) {
+			setTimeout(function(){this.revealMessage(nextMsg);}.bind(this), 500);
+		}
+		
 	}
 
 	render(){
