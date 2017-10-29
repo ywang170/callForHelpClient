@@ -4,6 +4,7 @@ import TimeSlotFormForAnswerQuestion from './TimeSlotFormForAnswerQuestion';
 import PopupAlert from '../utility/popupAlert/PopupAlert';
 import QuestionPostingForm from '../utility/questionPostingForm/QuestionPostingForm';
 import Header from '../header/Header';
+import ScrollDetector from '../utility/scrollDetector/ScrollDetector';
 import {withRouter} from 'react-router';
 import './Questions.css';
 
@@ -49,6 +50,25 @@ class Questions extends Component {
 
 	//////////////////////////////////////////////////////questions Loading//////////////////////////////////////////////////////////////////
 
+	/*
+	Logic here is important!!
+	We only load older or newer or everything
+	when we load older or newer, we just append to list. In the thrid case when load everything, we replace the old list
+
+	In case we didn't find anything suitable to put into question list:
+		happens when we load a bunch of question, but none of them is suitable for user to answer, then we will remove them from list
+		Now we have an empty list, but fortunately, when the number of questions < 20 we will keep calling "loadOlderQuestions" until no more can be loaded
+
+	In case we didn't load any questions from server at all...:
+		this means no available questions in database
+		In this bad situation, latestQuestionId and oldestQuestionId will not be updated
+		Fortunately nothing will be messed up because in every kind of loading, the query we passed to server is valid
+		For example, we have no quesstions and latestQuestionId = 0. Now when we auto load newer questions, since the latestQuestionId we passed in is 0, server will
+		think it as a load all query. And for whatever we get from server, it is fine to use client "load newer" rule and just append to questionList since we have none in
+		the list from very beginning.
+		In reality what more likely to happen is we load no questions from db at all, then loadOlderQuestions will trigger and load none as well, then load older will be disabled.
+		Then we periodically wait for loadNewerQuestions to see what we can find
+	*/
 	loadQuestions(loadNewer, loadOlder, amount){
 		if (this.state.blockLoadingQuestions) {
 			console.log("was trying to load more questions but action was blocked");
@@ -57,17 +77,17 @@ class Questions extends Component {
 		this.blockLoadingQuestions(loadOlder);
 		var serverUrl = '/getQuestions';
 
-		if (loadNewer && this.state.latestQuestionId && this.state.latestQuestionId !== 0) {
-			serverUrl += ('/' + this.state.latestQuestionId + '/0');
-
-		} else if (loadOlder && this.state.oldestQuestionId && this.state.oldestQuestionId !== 0) {
-			serverUrl += ('/0/' + this.state.oldestQuestionId);
-		} else {
-			serverUrl += '/0/0'
+		if (!amount || isNaN(amount) || amount <= 0 || amount > 100) {
+			amount = 20;
 		}
 
-		if (amount && !isNaN(amount) && amount > 0 && amount < 100) {
-			serverUrl += ('/' + amount);
+		if (loadNewer && this.state.latestQuestionId && this.state.latestQuestionId !== 0) {
+			serverUrl += ('/' + this.state.latestQuestionId + '/0/' + amount );
+
+		} else if (loadOlder && this.state.oldestQuestionId && this.state.oldestQuestionId !== 0) {
+			serverUrl += ('/0/' + this.state.oldestQuestionId + '/' + amount);
+		} else {
+			serverUrl += '/0/0/' + amount;
 		}
 
 		console.log(serverUrl);
@@ -140,7 +160,11 @@ class Questions extends Component {
 				oldestQuestionId: oldestQuestionIdTemp,
 				latestQuestionId: latestQuestionIdTemp,
 			});
+			//if there are too fewer questions then load more
 			this.unblockLoadingQuestions(loadOlder);
+			if (this.state.questionList.length < 20) {
+				this.loadOlderQuestions();
+			}
 			console.log("new oldest question Id " + this.state.oldestQuestionId);
 			console.log("new latest question Id " + this.state.latestQuestionId);
 			console.log("current user " + this.state.username);
@@ -156,6 +180,9 @@ class Questions extends Component {
 	Load more older questions and update oldatesQuestionId
 	*/
 	loadOlderQuestions(){
+		if (this.state.noMoreOlderQuestions){
+			return;
+		}
 		this.loadQuestions(false, true);
 	}
 
@@ -385,6 +412,10 @@ class Questions extends Component {
 		});
 	}
 
+	onScrollToBottom(){
+		this.loadOlderQuestions();
+	}
+
 	/////////////////////////////////////////////render view////////////////////////////////////////////////////////
 	componentWillUnmount(){
 		clearInterval(this.timeInterval);
@@ -428,13 +459,14 @@ class Questions extends Component {
 					onConfirmTime={(dateTime, comment) => this.onTimeSlotFormConfirmTime(dateTime, this.state.timeSlotFormQuestionId, comment)}
 					onCancelAnswerQuestion = {()=>this.onCancelAnswerQuestion()}/>
 					{this.state.noMoreOlderQuestions? 
-						<div className="NoMoreOlderQuestionsWarning">No more older questions</div> :
+						<div className="NoMoreOlderQuestionsWarning">No more...Above is all we got :P</div> :
 						<div className={this.state.loadingOlderQuestions?"LoadOlderQuestionsButtonDisable":"LoadOlderQuestionsButton"} onClick={() => this.loadOlderQuestions()}>
 							{this.state.loadingOlderQuestions?"Loading...":"Load me more questions"}
 						</div>
 					}
 					<PopupAlert ref="popupAlert"/>
 				</div>
+				<ScrollDetector onScrollToBottom={() => this.onScrollToBottom()} keepListening={!this.state.noMoreOlderQuestions}/>
 			</div>
 		);
 	}

@@ -87,8 +87,8 @@ class SignInSignUp extends Component {
 
 	submitSignUp() {
 		//username
-		if (this.state.username.length < 3 || this.state.username.length > 20) {
-			this.refs["PopupAlert"].showMessage('username must be between 3 to 20 characters');
+		if (this.state.username.length < 3 || this.state.username.length > 20 || !(/^[0-9a-zA-Z_-]+$/.test(this.state.username))) {
+			this.refs["PopupAlert"].showMessage('username must be between 3 to 20 characters and can only contain characters, numbers and "_ and -"');
 			return;
 		} 
 		//password
@@ -102,12 +102,12 @@ class SignInSignUp extends Component {
 			return;
 		} 
 		//phone
-		if (!this.state.phone || isNaN(this.state.phone)) {
-			this.refs["PopupAlert"].showMessage('phone number is not valid');
+		if (!this.state.phone || isNaN(this.state.phone) || !(/^[0-9]{10,11}$/.test(this.state.phone))) {
+			this.refs["PopupAlert"].showMessage('phone number must be 10 or 11 digit');
 			return;
 		} 
 		//email
-		if (!(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email))) {
+		if (!(/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(this.state.email))) {
 			this.refs["PopupAlert"].showMessage('email is not valid');
 			return;
 		} 
@@ -159,8 +159,8 @@ class SignInSignUp extends Component {
 		//check input valid
 		var inputValid = true;
 		//username
-		if (this.state.username.length < 3 || this.state.username.length > 20) {
-			this.refs["PopupAlert"].showMessage('username must be between 3 to 20 characters');
+		if (this.state.username.length < 3 || this.state.username.length > 20 || !(/^[0-9a-zA-Z_-]+$/.test(this.state.username))) {
+			this.refs["PopupAlert"].showMessage('username must be between 3 to 20 characters and can only contain characters, numbers and "_ and -"');
 			return;
 		} 
 		//password
