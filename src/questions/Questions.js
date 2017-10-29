@@ -3,6 +3,7 @@ import QuestionWithAnswerButton from './QuestionWithAnswerButton';
 import TimeSlotFormForAnswerQuestion from './TimeSlotFormForAnswerQuestion';
 import PopupAlert from '../utility/popupAlert/PopupAlert';
 import QuestionPostingForm from '../utility/questionPostingForm/QuestionPostingForm';
+import Header from '../header/Header';
 import {withRouter} from 'react-router';
 import './Questions.css';
 
@@ -39,6 +40,8 @@ class Questions extends Component {
 			showQuestionPostingForm: false,
 			//loading blocker
 			blockLoadingQuestions: false,
+			loadingOlderQuestions: false,
+			noMoreOlderQuestions: false,
 			//user info
 			username: '',
 		}
@@ -51,14 +54,14 @@ class Questions extends Component {
 			console.log("was trying to load more questions but action was blocked");
 			return;
 		}
-		this.blockLoadingQuestions();
+		this.blockLoadingQuestions(loadOlder);
 		var serverUrl = '/getQuestions';
 
 		if (loadNewer && this.state.latestQuestionId && this.state.latestQuestionId !== 0) {
 			serverUrl += ('/' + this.state.latestQuestionId + '/0');
 
 		} else if (loadOlder && this.state.oldestQuestionId && this.state.oldestQuestionId !== 0) {
-			serverUrl += ('/0/' + this.state.oldatesQuestionId);
+			serverUrl += ('/0/' + this.state.oldestQuestionId);
 		} else {
 			serverUrl += '/0/0'
 		}
@@ -93,6 +96,12 @@ class Questions extends Component {
 		}.bind(this))
 		.then(function(data){
 			var username = data.username;
+			//if user switched then we reload the page!
+			if (this.state.username && username && this.state.username !== username) {
+				console.log("you switched user...humm");
+				window.location.reload();
+				return;
+			}
 			var questionListTemp = [];
 			var oldestQuestionIdTemp = this.state.oldestQuestionId;
 			var latestQuestionIdTemp = this.state.latestQuestionId;
@@ -110,7 +119,7 @@ class Questions extends Component {
 			//question will always be in the order from oldest to newest
 			for (var i = 0; i < data.questions.length; i++) {
 				var question = data.questions[i];
-				if ((question.answererusernames && (question.answererusernames.includes(username)) || question.askerusername === username)) {
+				if ((question.answererusernames && question.answererusernames.includes(username)) || question.askerusername === username) {
 					continue;
 				}
 				questionListTemp.unshift(question);
@@ -126,17 +135,19 @@ class Questions extends Component {
 			//populate state
 			this.setState({
 				questionList: questionListTemp,
-				username: username,
+				username: username? username: this.state.username,
+				noMoreOlderQuestions: (loadOlder && (oldestQuestionIdTemp === this.state.oldestQuestionId))? true: this.state.noMoreOlderQuestions,
 				oldestQuestionId: oldestQuestionIdTemp,
 				latestQuestionId: latestQuestionIdTemp,
 			});
-			this.unblockLoadingQuestions();
+			this.unblockLoadingQuestions(loadOlder);
 			console.log("new oldest question Id " + this.state.oldestQuestionId);
 			console.log("new latest question Id " + this.state.latestQuestionId);
+			console.log("current user " + this.state.username);
 			
 		}.bind(this))
 		.catch(function(err){
-			this.unblockLoadingQuestions();
+			this.unblockLoadingQuestions(loadOlder);
 			console.log('get questions fail');
 		}.bind(this));
 	}
@@ -145,7 +156,7 @@ class Questions extends Component {
 	Load more older questions and update oldatesQuestionId
 	*/
 	loadOlderQuestions(){
-		
+		this.loadQuestions(false, true);
 	}
 
 	/*
@@ -345,17 +356,19 @@ class Questions extends Component {
 		this.props.history.push('/signInSignUp');			
 	}
 
-	blockLoadingQuestions(){
+	blockLoadingQuestions(loadOlder){
 		console.log("blocking loading questions");
 		this.setState({
 			blockLoadingQuestions: true,
+			loadingOlderQuestions: loadOlder? true: this.state.loadingOlderQuestions,
 		});
 	}
 
-	unblockLoadingQuestions(){
+	unblockLoadingQuestions(loadOlder){
 		console.log("unblocking loading questions");
 		this.setState({
 			blockLoadingQuestions: false,
+			loadingOlderQuestions: loadOlder? false: this.state.loadingOlderQuestions,
 		});
 	}
 
@@ -383,20 +396,27 @@ class Questions extends Component {
 
 	render() {
 		return (
-			<div className="QuestionsContainer">
-				<div className="AskingQuestionTriggerButton" onClick={()=>this.onShowQuestionPostingForm()}>Ask a Question</div>
-				<QuestionPostingForm asPopup={true} show={this.state.showQuestionPostingForm} onCancelCreateQuestion={()=>this.onCancelCreateQuestion()} 
-				onSubmit={()=>this.onSubmitQuestion()} onUserBusy={()=>this.onUserBusySubmittingQuestion()} onServerError={()=>this.onSubmitQuestionServerError()}
-				onValidationFail={()=>this.onValidationFail()}/>
+			<div>
+				<Header />
+				<div className="QuestionsContainer">
+					<div className="AskingQuestionTriggerButton" onClick={()=>this.onShowQuestionPostingForm()}>Ask a Question</div>
+					<QuestionPostingForm asPopup={true} show={this.state.showQuestionPostingForm} onCancelCreateQuestion={()=>this.onCancelCreateQuestion()} 
+					onSubmit={()=>this.onSubmitQuestion()} onUserBusy={()=>this.onUserBusySubmittingQuestion()} onServerError={()=>this.onSubmitQuestionServerError()}
+					onValidationFail={()=>this.onValidationFail()}/>
 
-				{this.renderQuestions()}
+					{this.renderQuestions()}
 
-				<TimeSlotFormForAnswerQuestion show={this.state.showTimeSlotForm} availableTimeSlots={this.state.timeSlotFormAvailableTimeSlot} 
-				onConfirmTime={(dateTime, comment) => this.onTimeSlotFormConfirmTime(dateTime, this.state.timeSlotFormQuestionId, comment)}
-				onCancelAnswerQuestion = {()=>this.onCancelAnswerQuestion()}/>
-				<div className="LoadOlderQuestionsButton" onClick={() => this.loadOlderQuestions()}>Load me more questions</div>
-
-				<PopupAlert ref="popupAlert"/>
+					<TimeSlotFormForAnswerQuestion show={this.state.showTimeSlotForm} availableTimeSlots={this.state.timeSlotFormAvailableTimeSlot} 
+					onConfirmTime={(dateTime, comment) => this.onTimeSlotFormConfirmTime(dateTime, this.state.timeSlotFormQuestionId, comment)}
+					onCancelAnswerQuestion = {()=>this.onCancelAnswerQuestion()}/>
+					{this.state.noMoreOlderQuestions? 
+						<div className="NoMoreOlderQuestionsWarning">No more older questions</div> :
+						<div className={this.state.loadingOlderQuestions?"LoadOlderQuestionsButtonDisable":"LoadOlderQuestionsButton"} onClick={() => this.loadOlderQuestions()}>
+							{this.state.loadingOlderQuestions?"Loading...":"Load me more questions"}
+						</div>
+					}
+					<PopupAlert ref="popupAlert"/>
+				</div>
 			</div>
 		);
 	}

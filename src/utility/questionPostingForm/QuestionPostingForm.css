@@ -12,7 +12,7 @@
 	position: fixed;
 	z-index: 11;
 	width:950px;
-	padding-left: 10px;
+	padding-left: 15px;
 	height: 630px;
 	background-color: rgb(249,231,159);
 	border-radius: 15px;
@@ -38,9 +38,19 @@
 	resize: none;
 }
 
+.QuestionPostingForm_questionPostingFormContainerPopup span{
+	margin-left: 20px;
+	font-size: 12pt;
+}
+
+.QuestionPostingForm_questionPostingFormContainerPopup textarea{
+	resize: none;
+}
+
 .QuestionPostingForm_questionTitle{
-	width:835px;
-	margin-top: 10px;
+	width:815px;
+	margin-left: 15px;
+	margin-top: 15px;
 	margin-bottom: 10px;
 	height:20px;
 	font-size: 14pt

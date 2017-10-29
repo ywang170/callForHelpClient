@@ -35,13 +35,15 @@
 
 .Header_title{
 	z-index: 1;
-	width: 600px;
+	width: 300px;
 	position: absolute;
 	left: 50%;
-	margin-left: -300px;
+	margin-left: -150px;
 	text-align: center;
 	font-size: 24pt;
 	color:white;
-	height: 200px;
-
+	height: 150px;
+	background-repeat: no-repeat;
+	background-size: contain;
+	background-image: url("../image/logo.png");
 }

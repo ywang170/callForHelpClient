@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {withRouter} from 'react-router';
 import PopupAlert from '../utility/popupAlert/PopupAlert';
+import Header from '../header/Header';
 import './SignInSignUp.css';
 
 class SignInSignUp extends Component {
@@ -262,12 +263,15 @@ class SignInSignUp extends Component {
 
 		//return content
 		return (
-			<div className="signInSignUpContainer">
-				<PopupAlert ref={"PopupAlert"} />
-				<div className="signInSignUpSubContainer">
-					<div className="title">{this.state.signUp? "Create a New Account":"User Login"}</div>
-					<a className="toggleButton" onClick={() => this.toggleSignInSignUp()}>{this.state.signUp?"I have an account":"register today!"}</a>
-					{moduleToShow}
+			<div>
+				<Header />
+				<div className="signInSignUpContainer">
+					<PopupAlert ref={"PopupAlert"} />
+					<div className="signInSignUpSubContainer">
+						<div className="title">{this.state.signUp? "Create a New Account":"User Login"}</div>
+						<a className="toggleButton" onClick={() => this.toggleSignInSignUp()}>{this.state.signUp?"I have an account":"register today!"}</a>
+						{moduleToShow}
+					</div>
 				</div>
 			</div>
 		);
