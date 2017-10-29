@@ -165,12 +165,17 @@ class Questions extends Component {
 	loadLaterQuestions(){
 		console.log("loading more recent questions");
 		this.loadQuestions(true, false);
-		setTimeout(this.loadLaterQuestions.bind(this), 30000);
 	}
 
 
 	/////////////////////////////////////////////////////asking a question///////////////////////////////////////////////////////////////////
 	onShowQuestionPostingForm(){
+		//block updating
+		if (this.state.blockLoadingQuestions) {
+			return;
+		} else {
+			this.blockLoadingQuestions();
+		}
 		this.setState({
 			showQuestionPostingForm: true,
 		})
@@ -180,12 +185,14 @@ class Questions extends Component {
 		this.setState({
 			showQuestionPostingForm: false,
 		})
+		this.unblockLoadingQuestions();
 	}
 
 	onSubmitQuestion(){
 		this.setState({
 			showQuestionPostingForm: false,
 		})
+		this.unblockLoadingQuestions();
 	}
 
 	onUserBusySubmittingQuestion(){
@@ -276,6 +283,7 @@ class Questions extends Component {
 	when user picked a time slot and confirm
 	*/
 	onTimeSlotFormConfirmTime(dateTime, questionId, comment) {
+
 		//hide popup
 		this.setState({
 			showTimeSlotForm: false,
@@ -310,7 +318,12 @@ class Questions extends Component {
 			//but we are going to remove a question from list. Here we do a binary search
 			this.deleteQuestionById(questionId);
 			this.unblockLoadingQuestions();
+			return res.json();
 			
+		}.bind(this))
+		.then(function(data){
+			this.refs["popupAlert"].showMessage("Thank you for your help! " + data.askerUsername +" will call you at " + new Date(data.time) +
+				" using possible phone number: " + data.askerPhone, 5000);
 		}.bind(this))
 		.catch(function(err){
 			console.log("confirming date fail!");
@@ -373,10 +386,15 @@ class Questions extends Component {
 	}
 
 	/////////////////////////////////////////////render view////////////////////////////////////////////////////////
+	componentWillUnmount(){
+		clearInterval(this.timeInterval);
+	}
+
 	componentDidMount(){
 		this.loadQuestions(false,false,30);
+		console.log(this.state.username);
 		//keep loading questions every a while
-		setTimeout(this.loadLaterQuestions.bind(this), 30000);
+		this.timeInterval = setInterval(this.loadLaterQuestions.bind(this), 30000);
 		
 	}
 

@@ -18,6 +18,10 @@ class PopupAlert extends Component{
 
 	showMessage(msg, timeoutTime){
 		if (this.state.message !== '') {
+			//do not show duplicate message
+			if (this.state.messageList.length > 0 && this.state.messageList[this.state.messageList.length-1] === msg){
+				return;
+			}
 			var messageListTemp = this.state.messageList;
 			messageListTemp.push(msg);
 			this.setState({
@@ -47,7 +51,14 @@ class PopupAlert extends Component{
 			messageList: messageListTemp,
 		});
 		if (nextMsg) {
-			setTimeout(function(){this.revealMessage(nextMsg);}.bind(this), 500);
+			this.timeout = setTimeout(function(){this.revealMessage(nextMsg);}.bind(this), 500);
+		}
+		
+	}
+
+	componentWillUnmount(){
+		if(this.timeout) {
+			clearTimeout(this.timeout)
 		}
 		
 	}
