@@ -238,7 +238,7 @@ class QuestionPostingForm extends Component {
 			if (!this.props.asPopup) {
 				this.unblockScreen();
 			}
-		});
+		}.bind(this));
 		if (this.props.onSubmit) {
 			this.props.onSubmit();
 		}						

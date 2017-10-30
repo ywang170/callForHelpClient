@@ -9,11 +9,16 @@ it doesn't deal with logic or server interaction at all
 Just reflect what user chooses and tell parent component
 
 Props: 	
-	onChoosingATimeSlot - processing picking a time slot. System calling time slot form should be responsible for logic
-	onUnChoosingATimeSlot - processing click again to cancel. System calling time slot form should be responsible for logic
+	onChoosingATimeSlot - processing picking a time slot. System calling time slot form should be responsible for logic. Should return false when user did invalid choice or we doon't want user change anything
+	onUnChoosingATimeSlot - processing click again to cancel. System calling time slot form should be responsible for logic Should return false when user did invalid choice or we doon't want user change anything
 	availableTimeSlots - time instant in number that is available
 	onlyOneChoice - is the form only allows one choice
 	currentInstant - current's instant
+	externalDays - like state days, but work as an external resource. If using external dates then parent will be responsible for updating which time slot is chosen
+					Currently the only use case is when we show use slots and we don't want user to change anything
+
+State:
+	days -  very  important, this is 2D array shows which slot are chosen. "days" is not a very good name... maybe I should rename it to slotsMap
 	
 */
 class TimeSlotForm extends Component {
@@ -28,6 +33,10 @@ class TimeSlotForm extends Component {
 	}
 
 	componentWillMount(){
+		if (this.props.externalDays){
+			return;
+		}
+
 		var daysTemp = []
 		for (var i = 0; i <= 3; i++){
 			var SlotChosenArr = [];
@@ -48,7 +57,7 @@ class TimeSlotForm extends Component {
 	Params:
 		day - which day does the slog belong
 		slot - hr of the slot
-		dateTime - the date and time being unchosen
+		dateTime - the date and time being unchosen in local time
 
 	Question:
 		Q: Why we don't use state to record which slot was chosen before and when we choose another slot we only update the old slot?
@@ -86,7 +95,7 @@ class TimeSlotForm extends Component {
 	Params:
 		day - which day does the slog belong
 		slot - hr of the slot
-		dateTime - the date and time being unchosen
+		dateTime - the date and time being unchosen in local time
 	*/
 	onUnChoosingATimeSlot(day, slot, dateTime) {
 		if (this.props.onUnChoosingATimeSlot(dateTime)) {
@@ -123,28 +132,28 @@ class TimeSlotForm extends Component {
 		var current = new Date(this.props.currentInstant);
 		//day 1
 		daysToRender.push (
-		<Day key={0} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.state.days[0]}
+		<Day key={0} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.props.externalDays? this.props.externalDays[0] : this.state.days[0]}
 		onChoosingATimeSlot={(slot, dateTime) => this.onChoosingATimeSlot(0, slot, dateTime)} 
 		 onUnChoosingATimeSlot={(slot, dateTime) => this.onUnChoosingATimeSlot(0, slot, dateTime)} isLastDay={false}
 		/>);
 		current.setDate(current.getDate() + 1);
 		//day 2
 		daysToRender.push (
-		<Day key={1} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.state.days[1]}
+		<Day key={1} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.props.externalDays? this.props.externalDays[1] : this.state.days[1]}
 		onChoosingATimeSlot={(slot, dateTime) => this.onChoosingATimeSlot(1, slot, dateTime)} 
 		 onUnChoosingATimeSlot={(slot, dateTime) => this.onUnChoosingATimeSlot(1, slot, dateTime)} isLastDay={false}
 		/>);
 		current.setDate(current.getDate() + 1);
 		//day 3
 		daysToRender.push (
-		<Day key={2} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.state.days[2]}
+		<Day key={2} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.props.externalDays? this.props.externalDays[2] : this.state.days[2]}
 		onChoosingATimeSlot={(slot, dateTime) => this.onChoosingATimeSlot(2, slot, dateTime)} 
 		 onUnChoosingATimeSlot={(slot, dateTime) => this.onUnChoosingATimeSlot(2, slot, dateTime)} isLastDay={false}
 		/>);
 		current.setDate(current.getDate() + 1);
 		//day 4
 		daysToRender.push (
-		<Day key={3} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.state.days[3]}
+		<Day key={3} date={current.toLocaleDateString()} availableTimeSlots={this.props.availableTimeSlots} slots={this.props.externalDays? this.props.externalDays[3] : this.state.days[3]}
 		onChoosingATimeSlot={(slot, dateTime) => this.onChoosingATimeSlot(3, slot, dateTime)} 
 		 onUnChoosingATimeSlot={(slot, dateTime) => this.onUnChoosingATimeSlot(3, slot, dateTime)} isLastDay={true}
 		/>);

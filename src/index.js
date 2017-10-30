@@ -13,6 +13,7 @@ import Notification from './utility/notification/Notification';
 import SignInSignUp from './signInSignUp/SignInSignUp';
 import Questions from './questions/Questions';
 import Credit from './credit/Credit';
+import MyNote from './myNote/MyNote';
 import registerServiceWorker from './registerServiceWorker';
 
 
@@ -22,6 +23,7 @@ ReactDOM.render(
 				<Route exact path="/" component={Questions} />
 				<Route exact path="/signInSignUp/:register?" component={SignInSignUp} />
 				<Route exact path="/questions" component={Questions} />
+				<Route exact path="/myNote" component={MyNote} />
 				<Route exact path="/credit" component={Credit} />
 				<Route exact path="/notificationTest" component={Notification} />
 			</div>

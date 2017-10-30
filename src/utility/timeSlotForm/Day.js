@@ -53,8 +53,8 @@ class Day extends Component {
 		var timeToShow = hourOfTheDay +":00"
 		//get the time instant of this day at this hour (We need to cast it to "time" so it is a UTC time)
 		var timeInstant = new Date(this.props.date + " " + timeToShow).getTime(); 
-		//check if this time instant is available, plus it has to be bigger than now
-		if (this.props.availableTimeSlots.has(timeInstant) && timeInstant > new Date().getTime()) {
+		//check if this time instant is available, plus it has to be bigger than now.. Also even if the time might not be available, if it is chosen we will show it as well
+		if (this.props.slots[hourOfTheDay] || (this.props.availableTimeSlots.has(timeInstant) && timeInstant > new Date().getTime())) {
 			return (
 				<TimeSlot ref={"timeSlot"+hourOfTheDay} time={timeToShow} date={this.props.date} available={true} onChoose={(datetime) => this.props.onChoosingATimeSlot(hourOfTheDay, datetime)} 
 				onUnChoose={(datetime) =>this.props.onUnChoosingATimeSlot(hourOfTheDay, datetime)} chosen={this.props.slots[hourOfTheDay]}

@@ -103,9 +103,10 @@ class Questions extends Component {
 			if (!res.ok) {
 				switch (res.status) {
 					case 401:
-						this.onValidationFail();
+						this.onValidationFail()	;
 						break;
 					default:  //other error, usually 500
+						console.log(res.json());
 						break;
 				}
 				console.log(res.json());
@@ -222,6 +223,10 @@ class Questions extends Component {
 		this.unblockLoadingQuestions();
 	}
 
+	onQuestionCreateSucceed(){
+		this.refs["popupAlert"].showMessage("your question is submitted! :)");
+	}
+
 	onUserBusySubmittingQuestion(){
 		this.refs["popupAlert"].showMessage("same user is submitting a question elsewhere, please try again later!");
 	}
@@ -315,6 +320,7 @@ class Questions extends Component {
 		this.setState({
 			showTimeSlotForm: false,
 		})
+		//change local time to time instant
 		var time = new Date(dateTime).getTime();
 		//send submittion to database
 		fetch('/setSlots/confirm', {
@@ -422,7 +428,7 @@ class Questions extends Component {
 	}
 
 	componentDidMount(){
-		this.loadQuestions(false,false,30);
+		this.loadQuestions(false,false,3);
 		console.log(this.state.username);
 		//keep loading questions every a while
 		this.timeInterval = setInterval(this.loadLaterQuestions.bind(this), 30000);
@@ -451,7 +457,7 @@ class Questions extends Component {
 					<div className="AskingQuestionTriggerButton" onClick={()=>this.onShowQuestionPostingForm()}>Ask a Question</div>
 					<QuestionPostingForm asPopup={true} show={this.state.showQuestionPostingForm} onCancelCreateQuestion={()=>this.onCancelCreateQuestion()} 
 					onSubmit={()=>this.onSubmitQuestion()} onUserBusy={()=>this.onUserBusySubmittingQuestion()} onServerError={()=>this.onSubmitQuestionServerError()}
-					onValidationFail={()=>this.onValidationFail()}/>
+					onValidationFail={()=>this.onValidationFail()} onSuccessful={()=>this.onQuestionCreateSucceed()} />
 
 					{this.renderQuestions()}
 
