@@ -9,7 +9,7 @@ import './index.css';
 //import ScreenBlockerTest from './test/ScreenBlockerTest'
 //import AskQuestionTest from './test/askQuestionTest';
 //import Header from './header/Header';
-//import Notification from './utility/notification/Notification';
+import Notification from './utility/notification/Notification';
 import SignInSignUp from './signInSignUp/SignInSignUp';
 import Questions from './questions/Questions';
 import Credit from './credit/Credit';
@@ -23,6 +23,7 @@ ReactDOM.render(
 				<Route exact path="/signInSignUp/:register?" component={SignInSignUp} />
 				<Route exact path="/questions" component={Questions} />
 				<Route exact path="/credit" component={Credit} />
+				<Route exact path="/notificationTest" component={Notification} />
 			</div>
 
 		</BrowserRouter>

@@ -251,6 +251,7 @@ class QuestionPostingForm extends Component {
 		timeSLot - time instant of the time slot
 	*/
 	onChoosingATimeSlot(timeSlot){
+		timeSlot = new Date(timeSlot).getTime();
 		if (this.state.chosenTimeSlots.has(timeSlot)) {
 			return true;
 		}
@@ -269,6 +270,7 @@ class QuestionPostingForm extends Component {
 		timeSLot - time instant of the time slot
 	*/
 	onUnChoosingATimeSlot(timeSlot){
+		timeSlot = new Date(timeSlot).getTime();
 		if (!this.state.chosenTimeSlots.has(timeSlot)) {
 			return true;
 		}
