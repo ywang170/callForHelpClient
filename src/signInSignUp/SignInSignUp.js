@@ -156,8 +156,6 @@ class SignInSignUp extends Component {
 	}
 
 	submitSignIn() {
-		//check input valid
-		var inputValid = true;
 		//username
 		if (this.state.username.length < 3 || this.state.username.length > 20 || !(/^[0-9a-zA-Z_-]+$/.test(this.state.username))) {
 			this.refs["PopupAlert"].showMessage('username must be between 3 to 20 characters and can only contain characters, numbers and "_ and -"');

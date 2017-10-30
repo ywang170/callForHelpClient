@@ -12,14 +12,17 @@ import './index.css';
 //import Notification from './utility/notification/Notification';
 import SignInSignUp from './signInSignUp/SignInSignUp';
 import Questions from './questions/Questions';
+import Credit from './credit/Credit';
 import registerServiceWorker from './registerServiceWorker';
 
 
 ReactDOM.render(
 		<BrowserRouter>
 			<div>
-				<Route path="/signInSignUp/:register?" component={SignInSignUp} />
-				<Route path="/questions" component={Questions} />
+				<Route exact path="/" component={Questions} />
+				<Route exact path="/signInSignUp/:register?" component={SignInSignUp} />
+				<Route exact path="/questions" component={Questions} />
+				<Route exact path="/credit" component={Credit} />
 			</div>
 
 		</BrowserRouter>

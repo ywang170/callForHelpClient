@@ -16,7 +16,7 @@ class Header extends Component{
 					<a className="Header_link">My Note</a>
 					<a className="Header_link">Setting</a>
 					<a className="Header_link" onClick={()=>this.toUrl('/signInSignUp')}>Login/Register</a>
-					<a className="Header_link">Credit</a>
+					<a className="Header_link" onClick={()=>this.toUrl('/credit')}>Credit</a>
 				</div>
 				<div className="Header_title"></div>
 				

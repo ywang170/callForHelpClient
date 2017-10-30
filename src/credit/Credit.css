@@ -1,0 +1,64 @@
+.Credit_container{
+	position: absolute;
+	padding: 0;
+	margin: 0;
+	top:0;
+	left:0;
+	width:100%;
+	height: 100%;
+	z-index: -1;
+	background-color: red;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-image: url("../image/credit_background.gif");
+}
+
+.Credit_docs{
+	position: absolute;
+	left: 50%;
+	top: 300px;
+	width:300px;
+	margin-left: -160px;
+	background-color: black;
+	border-radius: 15px;
+	text-align: center;
+	padding: 10px;
+}
+
+.Credit_docs a:link, a:visited{
+	font-size: 16pt;
+	text-decoration: none;
+	color:lightgray;
+}
+
+.Credit_docs a:hover{
+	color:white;
+	text-shadow: 0px 0px 5px white;
+}
+
+.Credit_cast{
+	position: fixed;
+	width: 400px;
+	height: 800px;
+	right: 100px;
+	bottom: 2000px;
+	z-index: 0;
+	animation: scrollUp 100s;
+	text-align: center;
+}
+
+.Credit_cast p {
+	font-size: 14pt;
+	color:white;
+}
+
+.Credit_cast h1,h2{
+	font-size: 20pt;
+	color:white;
+}
+
+@keyframes scrollUp{
+	0% {bottom: -800px;}
+	100% {bottom: 2000px;}
+}
+
