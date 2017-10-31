@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Header from '../header/Header';
 import PopupAlert from '../utility/popupAlert/PopupAlert';
 import TimeSlotForm from '../utility/timeSlotForm/TimeSlotForm';
+import QuestionWithCalendar from './QuestionWithCalendar';
 import {withRouter} from 'react-router';
 import './MyNote.css';
 
@@ -39,6 +40,7 @@ class MyNote extends Component{
 			questionList:[],
 			userSlots: null,
 			chosenSlot: '',
+			chosenQuestionId: '',
 			oldestQuestionId: '',
 			username: '',
 			currentInstant: ''
@@ -164,12 +166,13 @@ class MyNote extends Component{
 			//update newer and older
 			if(data.questions.length !== 0){
 				oldestQuestionIdTemp = data.questions[0].questionid;	
+				console.log("oldest question " + data.questions[0].title);
 			}
 			//question will always be in the order from oldest to newest
 			for (var i = 0; i < data.questions.length; i++) {
 				var question = data.questions[i];
 				console.log(question);
-				questionListTemp.push(question);
+				questionListTemp.unshift(question);
 			}
 			questionListTemp = this.state.questionList.concat(questionListTemp);
 			//populate state
@@ -183,15 +186,26 @@ class MyNote extends Component{
 		}.bind(this));
 	}
 
-	renderQuestions(){
-		var result=[];
 
-		return result;
-	}
-
-
-	onQuestionChosen(questionAvailability){
+	onQuestionChosen(questionAvailability, questionId){
+		if(this.state.chosenQuestionId === questionId){
+			this.setState({
+				chosenQuestionId: '',
+				questionAvailableTimeSlots: new Set(),
+			})
+			return;
+		}
 		//update "availableTimeSlots"
+		var questionAvailableTimeSlotsTemp = new Set();
+		for (var i = 0; i < questionAvailability.length; i++) {
+			console.log(questionAvailability[i]);
+			questionAvailableTimeSlotsTemp.add(new Date(questionAvailability[i]).getTime());
+		}
+		console.log(questionAvailableTimeSlotsTemp);
+		this.setState({
+			questionAvailableTimeSlots: questionAvailableTimeSlotsTemp,
+			chosenQuestionId: questionId,
+		});
 	}
 
 	onQuestionUnChosen(){
@@ -231,12 +245,25 @@ class MyNote extends Component{
 
 	componentDidMount(){
 		//load questions
-		this.loadQuestions();
+		this.loadQuestions(20);
 	}
 
 	componentWillUnmount(){
 		//clear time interval
 		clearInterval(this.timeInterval);
+	}
+
+	renderQuestions(){
+		var questionsToRender = [];
+		for (var i = 0;  i < this.state.questionList.length; i++) {
+			var question = this.state.questionList[i];
+
+			questionsToRender.push(
+				<QuestionWithCalendar key={question.questionid} chosen={question.questionid===this.state.chosenQuestionId} questionId={question.questionid} slots={question.slots} title={question.title} content={question.content} username={this.state.username} 
+				onQuestionChosen={(questionAvailableSlots, questionId)=>this.onQuestionChosen(questionAvailableSlots, questionId)}/>
+			);
+		}
+		return questionsToRender;
 	}
 
 

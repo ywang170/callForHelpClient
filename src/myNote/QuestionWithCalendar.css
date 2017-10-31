@@ -1,0 +1,39 @@
+.MyNote_calendarIcon{
+	float:left;
+	margin-top: 5px;
+	width:40px;
+	height: 40px;
+	margin-left: 10px;
+	background-size: contain;
+	background-image: url('../image/calendar.png');
+	opacity: 0.6;
+	cursor: pointer;
+	-webkit-transition-duration: 0.2s;
+	transition-duration: 0.2s;
+}
+
+.MyNote_calendarIcon:hover{
+	opacity: 1;
+}
+
+
+.MyNote_questionWrapperChosen{
+	width: 555px;
+	margin: 5px;
+	border-radius: 25px;
+	border: 2px orange solid;
+	background-color: orange;
+	float:left;
+}
+
+.MyNote_questionWrapperChosen .MyNote_calendarIcon{
+	opacity: 1;
+}
+
+.MyNote_questionWrapper{
+	width: 555px;
+	margin: 5px;
+	border-radius: 25px;
+	border: 2px lightblue solid;
+	float:left;
+}

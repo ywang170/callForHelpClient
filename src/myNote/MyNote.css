@@ -2,21 +2,23 @@
 	position: absolute;
 	top: 200px;
 	left: 50%;
-	width: 600px;
-	height: 900px;
+	width: 570px;
 	margin-left: -400px;
+	padding-bottom: 10px;
 	background-color: lightblue;
 }
 
 
 .MyNote_timeSlotContainer{
 	position: fixed;
-	bottom: 10px;
+	top: 200px;
 	left:50%;
 	margin-left: 150px;
 	padding-top: 10px;
 	width: 450px;
-	height: 500px;
+	height: 520px;
 	z-index: 5;
 }
+
+
 

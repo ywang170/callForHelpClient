@@ -428,7 +428,7 @@ class Questions extends Component {
 	}
 
 	componentDidMount(){
-		this.loadQuestions(false,false,3);
+		this.loadQuestions(false,false,20);
 		console.log(this.state.username);
 		//keep loading questions every a while
 		this.timeInterval = setInterval(this.loadLaterQuestions.bind(this), 30000);
