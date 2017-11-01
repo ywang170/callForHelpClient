@@ -76,7 +76,7 @@ class QuestionPostingForm extends Component {
 			availableTimeSlotsTemp.add(currDateTime.getTime());
 		}
 		//load all registered time slots for user
-		fetch('http://127.0.0.1:8081/getSlots/simple/', {
+		fetch('getSlots/simple/', {
 			method: "GET",
 			mode: 'cors',
 			credentials: 'same-origin',
@@ -179,7 +179,7 @@ class QuestionPostingForm extends Component {
 		//block screen to prevent further user interaction
 		this.blockScreen();
 		//send submittion to database
-		fetch('http://www.justcallforhelp.com:8081/setQuestions/create', {
+		fetch('setQuestions/create', {
 			method: "POST",
 			mode: 'cors',
 			credentials: 'same-origin',

@@ -113,7 +113,7 @@ class SignInSignUp extends Component {
 		} 
 
 		//send request
-		fetch('http://127.0.0.1:8081/register', {
+		fetch('register', {
 			method: "POST",
 			mode: 'cors',
 			credentials: 'same-origin',
@@ -168,7 +168,7 @@ class SignInSignUp extends Component {
 		}
 
 		//send to data base
-		fetch('http://127.0.0.1:8081/logIn', {
+		fetch('logIn', {
 			method: "POST",
 			mode: 'cors',
 			credentials: 'same-origin',

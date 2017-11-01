@@ -53,7 +53,7 @@ class MyNote extends Component{
 
 	loadUserSlots(){
 		//load user slots
-		fetch('http://www.justcallforhelp.com:8081/getSlots/detail/', {
+		fetch('getSlots/detail/', {
 			method: "GET",
 			mode: 'cors',
 			credentials: 'same-origin',
@@ -140,7 +140,7 @@ class MyNote extends Component{
 			loadingOlderQuestions: true,
 		});
 
-		var serverUrl = 'http://www.justcallforhelp.com:8081/getMyQuestions';
+		var serverUrl = 'getMyQuestions';
 
 		if (!amount || isNaN(amount) || amount <= 0 || amount > 100) {
 			amount = 20;
