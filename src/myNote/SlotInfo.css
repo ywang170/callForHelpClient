@@ -1,0 +1,23 @@
+.SlotInfo_slotInfoContainer{
+	padding: 10px;
+	border-radius: 25px;
+	z-index: 11;
+	position: fixed;
+	width:600px;
+	background-color: white;
+	left:50%;
+	margin-left: -312.5px;
+	top: 300px;
+	border: 5px solid steelblue	;
+}
+
+.SlotInfo_infoBlock{
+	text-align: center;
+	color:gray;
+	font-size: 11pt;
+}
+
+.SlotInfo_infoBlock span{
+	color: steelblue;
+	font-size: 12pt;
+}

@@ -3,6 +3,8 @@ import Header from '../header/Header';
 import PopupAlert from '../utility/popupAlert/PopupAlert';
 import TimeSlotForm from '../utility/timeSlotForm/TimeSlotForm';
 import QuestionWithCalendar from './QuestionWithCalendar';
+import SlotInfo from './SlotInfo';
+import ScrollDetector from '../utility/scrollDetector/ScrollDetector';
 import {withRouter} from 'react-router';
 import './MyNote.css';
 
@@ -43,7 +45,9 @@ class MyNote extends Component{
 			chosenQuestionId: '',
 			oldestQuestionId: '',
 			username: '',
-			currentInstant: ''
+			currentInstant: '',
+			noMoreOlderQuestions: false,
+			loadingOlderQuestions: false,
 		}
 	}
 
@@ -128,6 +132,14 @@ class MyNote extends Component{
 
 	//////////////////////////////////////////////////////////questions//////////////////////////////////////////////////////////
 	loadQuestions(amount){
+		if (this.state.noMoreOlderQuestions || this.state.loadingOlderQuestions) {
+			return;
+		}
+
+		this.setState({
+			loadingOlderQuestions: true,
+		});
+
 		var serverUrl = '/getMyQuestions';
 
 		if (!amount || isNaN(amount) || amount <= 0 || amount > 100) {
@@ -178,11 +190,16 @@ class MyNote extends Component{
 			//populate state
 			this.setState({
 				questionList: questionListTemp,
+				noMoreOlderQuestions: this.state.oldestQuestionId === oldestQuestionIdTemp,
 				oldestQuestionId: oldestQuestionIdTemp,
+				loadingOlderQuestions: false,
 			});
 			
 		}.bind(this))
 		.catch(function(err){
+			this.setState({
+				loadingOlderQuestions: false,
+			});
 		}.bind(this));
 	}
 
@@ -212,21 +229,36 @@ class MyNote extends Component{
 		//clear "availableTimeSlots"
 	}
 
+	onScrollToBottom(){
+		if (this.state.noMoreOlderQuestions){
+			return;
+		}
+		this.loadQuestions();
+	}
+
 
 	/*
 	show information about this slot. use dateTime to get an instant and use the instant to get slot itself
 	*/
-	onChooseTakenSlot(day, slot, dateTime){
+	onChooseTakenSlot(dateTime){
 		//change chosenSlot using dateTime to get instant and retrieve from "userSlots"
-
+		this.setState({
+			chosenSlot:new Date(dateTime).getTime(),
+		})
 		return false;
 	}
 
 	/*
 	just return false
 	*/
-	onChooseEmptySlot(day, slot, dateTime){
+	onChooseEmptySlot(dateTime){
 		return false;
+	}
+
+	hideSlotInfo(){
+		this.setState({
+			chosenSlot: '',
+		});
 	}
 
 	/*
@@ -271,15 +303,30 @@ class MyNote extends Component{
 		return (
 			<div >
 				<Header/>
+
 				<div className="MyNote_questionContainer">
 				{this.renderQuestions()}
+				{this.state.noMoreOlderQuestions? 
+					<div className="MyNote_NoMoreOlderQuestionsWarning">No more...Above is all we got :P</div> :
+					<div className={this.state.loadingOlderQuestions?"MyNote_LoadOlderQuestionsButtonDisable":"MyNote_LoadOlderQuestionsButton"} onClick={() => this.loadQuestions()}>
+						{this.state.loadingOlderQuestions?"Loading...":"Load me more questions"}
+					</div>
+				}
 				</div>
 				
 				<div className="MyNote_timeSlotContainer">
 					<TimeSlotForm externalDays={this.state.takenAndEmptySlotsMap} currentInstant={this.state.currentInstant} 
-					availableTimeSlots={this.state.questionAvailableTimeSlots} onUnChoosingATimeSlot={(day, slot, dateTime)=>this.onChooseTakenSlot(day, slot, dateTime)}
+					availableTimeSlots={this.state.questionAvailableTimeSlots} onUnChoosingATimeSlot={(dateTime)=>this.onChooseTakenSlot(dateTime)}
 					onChoosingATimeSlot={()=>this.onChooseEmptySlot()}/>
 				</div>
+
+				{this.state.chosenSlot?
+					<SlotInfo slot={this.state.userSlots[this.state.chosenSlot]} hideSlotInfo={()=>this.hideSlotInfo()}/>
+					:
+					null
+				}
+
+				<ScrollDetector onScrollToBottom={() => this.onScrollToBottom()} keepListening={!this.state.noMoreOlderQuestions}/>
 				<PopupAlert ref="popupAlert"/>
 			</div>
 		);
