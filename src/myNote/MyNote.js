@@ -63,6 +63,8 @@ class MyNote extends Component{
 			console.log(res);
 			if (!res.ok) {
 				switch (res.status) {
+					case 401:
+						this.onValidationFail();
 					default:  //other error, usually 500
 						console.log("getting user slot error");
 						break;
@@ -163,6 +165,9 @@ class MyNote extends Component{
 		.then(function(res){
 			if (!res.ok) {
 				switch (res.status) {
+					case 401:
+						this.onValidationFail();
+						break;
 					default:  //other error, usually 500
 						break;
 				}
@@ -259,6 +264,10 @@ class MyNote extends Component{
 		this.setState({
 			chosenSlot: '',
 		});
+	}
+
+	onValidationFail(){
+		this.props.history.push('/signInSignUp');			
 	}
 
 	/*
