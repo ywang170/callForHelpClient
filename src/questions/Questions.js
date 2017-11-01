@@ -75,7 +75,7 @@ class Questions extends Component {
 			return;
 		}
 		this.blockLoadingQuestions(loadOlder);
-		var serverUrl = '/getQuestions';
+		var serverUrl = 'http://127.0.0.1:8081/getQuestions';
 
 		if (!amount || isNaN(amount) || amount <= 0 || amount > 100) {
 			amount = 20;
@@ -261,7 +261,7 @@ class Questions extends Component {
 			}
 			availableTimeSlots.add(slotInstant);
 		}
-		fetch('/getSlots/simple/'+askerUsername, {
+		fetch('http://127.0.0.1:8081/getSlots/simple/'+askerUsername, {
 			method: "GET",
 			mode: 'cors',
 			credentials: 'same-origin',
@@ -323,7 +323,7 @@ class Questions extends Component {
 		//change local time to time instant
 		var time = new Date(dateTime).getTime();
 		//send submittion to database
-		fetch('/setSlots/confirm', {
+		fetch('http://127.0.0.1:8081/setSlots/confirm', {
 			method: "POST",
 			mode: 'cors',
 			credentials: 'same-origin',
